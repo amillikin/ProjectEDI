@@ -59,18 +59,6 @@ public class MainWindow {
 		menuBar.add(mnOptions);
 		
 		JMenuItem mntmSerialComPort = new JMenuItem("Serial COM Port Configuration");
-		/*mntmSerialComPort.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				try {
-					SerialSettings dialog = new SerialSettings();
-					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-					dialog.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});*/
 		mnOptions.add(mntmSerialComPort);
 		
 		JMenuItem mntmStaffConfiguration = new JMenuItem("Staff Configuration");
@@ -82,6 +70,5 @@ public class MainWindow {
 		JMenuItem mntmAbout = new JMenuItem("About");
 		mnHelp.add(mntmAbout);
 	}
-	
 	
 }
