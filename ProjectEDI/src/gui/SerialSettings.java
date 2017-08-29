@@ -24,10 +24,7 @@ import javax.swing.JRadioButton;
 
 public class SerialSettings extends JDialog {
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		try {
 			SerialSettings dialog = new SerialSettings();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -35,11 +32,8 @@ public class SerialSettings extends JDialog {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 
-	/**
-	 * Create the dialog.
-	 */
 	public SerialSettings() {
 		setTitle("Serial Port Configuration");
 		setBounds(100, 100, 450, 450);
