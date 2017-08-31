@@ -61,7 +61,7 @@ public class MainWindow {
 		JMenuItem mntmSerialComPort = new JMenuItem("Serial COM Port Configuration");
 		mntmSerialComPort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mntmSerialComPortActionPerformed(arg0);
+				mntmSerialComPortActPerf(arg0);
 			}
 		});
 		mnOptions.add(mntmSerialComPort);
@@ -76,7 +76,7 @@ public class MainWindow {
 		mnHelp.add(mntmAbout);
 	}
 	
-	private static void ntmSerialComPortActionPerformed(ActionEvent arg0) {
+	private static void mntmSerialComPortActPerf(ActionEvent arg0) {
 		try {
 			SerialSettings dialog = new SerialSettings();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
