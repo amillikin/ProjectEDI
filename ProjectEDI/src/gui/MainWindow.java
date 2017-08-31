@@ -61,13 +61,18 @@ public class MainWindow {
 		JMenuItem mntmSerialComPort = new JMenuItem("Serial COM Port Configuration");
 		mntmSerialComPort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mntmSerialComPortActPerf(arg0);
+				mntmSerialComPort_Clicked(arg0);
 			}
 		});
 		mnOptions.add(mntmSerialComPort);
 		
-		JMenuItem mntmStaffConfiguration = new JMenuItem("Staff Configuration");
-		mnOptions.add(mntmStaffConfiguration);
+		JMenuItem mntmNotationConfig = new JMenuItem("Staff Notatition Configuration");
+		mntmNotationConfig.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mntmNotationConfig_Clicked(arg0);
+			}
+		});
+		mnOptions.add(mntmNotationConfig);
 		
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
@@ -76,9 +81,18 @@ public class MainWindow {
 		mnHelp.add(mntmAbout);
 	}
 	
-	private static void mntmSerialComPortActPerf(ActionEvent arg0) {
+	private static void mntmSerialComPort_Clicked(ActionEvent arg0) {
 		try {
-			SerialSettings dialog = new SerialSettings();
+			SerialConfig dialog = new SerialConfig();
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	private static void mntmNotationConfig_Clicked(ActionEvent arg0) {
+		try {
+			NotationConfig dialog = new NotationConfig();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {

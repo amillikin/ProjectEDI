@@ -31,14 +31,15 @@ import javax.swing.JCheckBox;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 
-public class SerialSettings extends JDialog {
+public class SerialConfig extends JDialog {
 	private static SerialPort[] comPort = SerialPort.getCommPorts();
 	private static final String[] instrumentList = new String[] {"","Snare","Tom","Hi-hat","Bass","Ride Cymbal","Crash Cymbal"};
 	//private Integer[] blank
 	
-	public SerialSettings() {
+	public SerialConfig() {
 		setTitle("Serial Port Configuration");
 		setBounds(100, 100, 450, 450);
+		setResizable(false);
 		getContentPane().setLayout(new MigLayout("", "[grow][grow][][]", "[33px][][][][][][][][][][][][][]"));
 		{
 			JToolBar toolBar = new JToolBar();
@@ -74,7 +75,7 @@ public class SerialSettings extends JDialog {
 			cBoxInst1.addItemListener(new ItemListener() {
 				public void itemStateChanged(ItemEvent arg0) {
 					Object item = cBoxInst1.getSelectedItem();
-					setInstCBox(1,item);
+					//setInstCBox(1,item);
 				}
 			});
 			for (String instrument: instrumentList) {
@@ -413,7 +414,7 @@ public class SerialSettings extends JDialog {
 			}
 		}
 	}
-	
+/*	
 	private static void setInstCBox(Integer cBoxRef, Object item) {
 		switch (cBoxRef) {
 			case 1:		if ("".equals(item)) {
@@ -498,5 +499,5 @@ public class SerialSettings extends JDialog {
 		
 		}
 
-	}
+	}*/
 }
