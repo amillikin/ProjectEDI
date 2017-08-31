@@ -11,8 +11,11 @@ import javax.swing.border.EmptyBorder;
 public class NotationConfig extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-
+	
 	public NotationConfig() {
+		initialize();
+	}
+	private void initialize() {
 		setTitle("Staff Notation Configuration");
 		setBounds(100, 100, 660, 450);
 		getContentPane().setLayout(new BorderLayout());

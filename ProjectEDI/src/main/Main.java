@@ -11,7 +11,7 @@ public class Main {
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
-					window.frmProjectedi.setVisible(true);
+					window.mainWindow.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

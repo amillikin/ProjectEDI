@@ -5,80 +5,160 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JToolBar;
+import javax.swing.filechooser.FileSystemView;
+
 import java.awt.BorderLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JMenuItem;
 import java.awt.Frame;
+import java.awt.ScrollPane;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import com.fazecast.jSerialComm.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+
+import jm.music.data.Part;
+import jm.music.data.Phrase;
+import jm.music.data.Score;
+import javax.swing.JScrollPane;
 
 public class MainWindow {
 
-	public JFrame frmProjectedi;
-
+	public final JFrame mainWindow = new JFrame();
+	private final JMenuBar menuBar = new JMenuBar();
+	private final JMenu mnFile = new JMenu("File");
+	private final JMenuItem mntmNew = new JMenuItem("New");
+	private final JMenuItem mntmLoad = new JMenuItem("Load");
+	private final JMenuItem mntmSaveAs = new JMenuItem("SaveAs");
+	private final JMenuItem mntmSave = new JMenuItem("Save");
+	private final JMenu mnToolbars = new JMenu("Toolbars");
+	private final JMenuItem mntmMusic = new JMenuItem("Music");
+	private final JMenu mnOptions = new JMenu("Options");
+	private final JMenuItem mntmSerialComPort = new JMenuItem("Serial COM Port Configuration");
+	private final JMenuItem mntmNotationConfig = new JMenuItem("Staff Notatition Configuration");
+	private final JMenu mnHelp = new JMenu("Help");
+	private final JMenuItem mntmAbout = new JMenuItem("About");
+	private final JScrollPane scrollPane = new JScrollPane();
+	
 	public MainWindow() {
 		initialize();
 	}
 
 	public void initialize() {
-		frmProjectedi = new JFrame();
-		frmProjectedi.setExtendedState(Frame.MAXIMIZED_BOTH);
-		frmProjectedi.setTitle("ProjectEDI");
-		frmProjectedi.setBounds(100, 100, 640, 480);
-		frmProjectedi.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
+		mainWindow.setTitle("ProjectEDI");
+		mainWindow.setBounds(100, 100, 640, 480);
+		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainWindow.setJMenuBar(menuBar);
+		mainWindow.getContentPane().add(scrollPane, BorderLayout.WEST);
 		
-		JMenuBar menuBar = new JMenuBar();
-		frmProjectedi.setJMenuBar(menuBar);
-		
-		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
-		
-		JMenuItem mntmNew = new JMenuItem("New");
 		mnFile.add(mntmNew);
-		
-		JMenuItem mntmLoad = new JMenuItem("Load");
 		mnFile.add(mntmLoad);
-		
-		JMenuItem mntmSave = new JMenuItem("Save");
+		mnFile.add(mntmSaveAs);
 		mnFile.add(mntmSave);
 		
-		JMenu mnToolbars = new JMenu("Toolbars");
 		menuBar.add(mnToolbars);
-		
-		JMenuItem mntmMusic = new JMenuItem("Music");
 		mnToolbars.add(mntmMusic);
 		
-		JMenu mnOptions = new JMenu("Options");
 		menuBar.add(mnOptions);
+		mnOptions.add(mntmSerialComPort);
+		mnOptions.add(mntmNotationConfig);
 		
-		JMenuItem mntmSerialComPort = new JMenuItem("Serial COM Port Configuration");
+		menuBar.add(mnHelp);
+		mnHelp.add(mntmAbout);
+		
+		mntmNew.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mntmNew_Clicked(arg0);
+			}
+		});
+		
+		mntmLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mntmLoad_Clicked(arg0);
+			}
+		});
+	
+		mntmSaveAs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mntmSaveAs_Clicked(arg0);
+			}
+		});
+		
+		mntmSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mntmSave_Clicked(arg0);
+			}
+		});
+				
 		mntmSerialComPort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mntmSerialComPort_Clicked(arg0);
 			}
 		});
-		mnOptions.add(mntmSerialComPort);
 		
-		JMenuItem mntmNotationConfig = new JMenuItem("Staff Notatition Configuration");
 		mntmNotationConfig.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mntmNotationConfig_Clicked(arg0);
 			}
 		});
-		mnOptions.add(mntmNotationConfig);
 		
-		JMenu mnHelp = new JMenu("Help");
-		menuBar.add(mnHelp);
-		
-		JMenuItem mntmAbout = new JMenuItem("About");
-		mnHelp.add(mntmAbout);
+	}
+	
+	private static void mntmNew_Clicked(ActionEvent arg0) {
+		try {
+			ScoreWindow scoreFrame = new ScoreWindow();
+			scoreFrame.pack();
+			scoreFrame.setVisible(true);			 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void mntmLoad_Clicked(ActionEvent arg0) {
+		try {
+			JFileChooser fc = new JFileChooser();
+			fc.setCurrentDirectory(FileSystemView.getFileSystemView().getDefaultDirectory());
+			int retVal = fc.showOpenDialog(null);
+			if (retVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				//Handle file to load
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void mntmSaveAs_Clicked(ActionEvent arg0) {
+		try {
+			JFileChooser fc = new JFileChooser();
+			fc.setCurrentDirectory(FileSystemView.getFileSystemView().getDefaultDirectory());
+			int retVal = fc.showSaveDialog(null);
+			if (retVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				//Handle file to save
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	private static void mntmSave_Clicked(ActionEvent arg0) {
+		try {
+			//If file exists, save file, else, prompt with SaveAs dialog
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static void mntmSerialComPort_Clicked(ActionEvent arg0) {
