@@ -25,6 +25,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
+import jm.gui.show.ShowScore;
+import jm.music.data.Note;
 import jm.music.data.Part;
 import jm.music.data.Phrase;
 import jm.music.data.Score;
@@ -116,9 +118,18 @@ public class MainWindow {
 	
 	private static void mntmNew_Clicked(ActionEvent arg0) {
 		try {
-			ScoreWindow scoreFrame = new ScoreWindow();
+			Score score = new Score("New Score");
+			Part part1 = new Part("Snare", 1, 0);
+			Phrase phrase1 = new Phrase(0.0);
+			Note note1 = new Note(46, 1);
+			Note note2 = new Note(36,2);
+			phrase1.add(note1);
+			phrase1.add(note2);
+			part1.addPhrase(phrase1);
+			score.addPart(part1);
+			ShowScore scoreFrame = new ShowScore(score);
 			scoreFrame.pack();
-			scoreFrame.setVisible(true);			 
+			scoreFrame.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
