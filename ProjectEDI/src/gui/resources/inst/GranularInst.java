@@ -1,3 +1,5 @@
+package gui.resources.inst;
+
 /**
  * GranularInst.java
  * Author: Timothy Opie

@@ -1,3 +1,5 @@
+package gui.resources.inst;
+
 //==========================================================
 // File:                 NoiseInst.java
 // Package:              inst

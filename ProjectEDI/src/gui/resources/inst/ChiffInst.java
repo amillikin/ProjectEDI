@@ -1,4 +1,7 @@
+package gui.resources.inst;
+
 //==========================================================
+
 // File:                 ChiffInst.java
 // Package:              inst
 // Function:             basic implementation of a white noise burst
