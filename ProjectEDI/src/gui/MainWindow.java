@@ -25,6 +25,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
+import jm.gui.cpn.JmMidiPlayer;
+import jm.gui.cpn.Notate;
+import jm.gui.cpn.Stave;
+import jm.gui.helper.HelperGUI;
 import jm.gui.show.ShowScore;
 import jm.music.data.Note;
 import jm.music.data.Part;
@@ -119,17 +123,31 @@ public class MainWindow {
 	private static void mntmNew_Clicked(ActionEvent arg0) {
 		try {
 			Score score = new Score("New Score");
-			Part part1 = new Part(jm.constants.DrumMap.ACOUSTIC_SNARE);
+			Part part1 = new Part("Drum Kit",0,9);
 			Phrase phrase1 = new Phrase(0.0);
-			Note note1 = new Note(46, 1);
-			Note note2 = new Note(50, 2);
-			Note note3 = new Note(50,.5);
+			Note note1 = new Note(jm.constants.DrumMap.ACOUSTIC_SNARE,jm.constants.Durations.EN);
+			Note note2 = new Note(jm.constants.DrumMap.ACOUSTIC_SNARE,jm.constants.Durations.EN);
+			Note note3 = new Note(jm.constants.DrumMap.ACOUSTIC_SNARE,jm.constants.Durations.EN);
+			Note note4 = new Note(jm.constants.DrumMap.ACOUSTIC_SNARE,jm.constants.Durations.EN);
 			phrase1.add(note1);
 			phrase1.add(note2);
 			phrase1.add(note3);
+			phrase1.add(note4);
 			part1.addPhrase(phrase1);
+			//score.addPart(part1);
+			//Part part2 = new Part("Drum Kit",0,9);
+			Phrase phrase2 = new Phrase(0.0);
+			note1 = new Note(jm.constants.DrumMap.OPEN_HI_HAT,jm.constants.Durations.EN);
+			note2 = new Note(jm.constants.DrumMap.CLOSED_HI_HAT,jm.constants.Durations.EN);
+			note3 = new Note(jm.constants.DrumMap.CLOSED_HI_HAT,jm.constants.Durations.EN);
+			note4 = new Note(jm.constants.DrumMap.CLOSED_HI_HAT,jm.constants.Durations.EN);
+			phrase2.add(note1);
+			phrase2.add(note2);
+			phrase2.add(note3);
+			phrase2.add(note4);
+			part1.addPhrase(phrase2);
 			score.addPart(part1);
-			ShowScore scoreFrame = new ShowScore(score);
+			Notate scoreFrame = new Notate(score, 0, 0);
 			scoreFrame.pack();
 			scoreFrame.setVisible(true);
 		} catch (Exception e) {
@@ -178,6 +196,8 @@ public class MainWindow {
 		try {
 			SerialConfig dialog = new SerialConfig();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.pack();
+			dialog.setModal(true);
 			dialog.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -187,6 +207,8 @@ public class MainWindow {
 		try {
 			NotationConfig dialog = new NotationConfig();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.pack();
+			dialog.setModal(true);
 			dialog.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
