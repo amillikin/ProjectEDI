@@ -119,12 +119,14 @@ public class MainWindow {
 	private static void mntmNew_Clicked(ActionEvent arg0) {
 		try {
 			Score score = new Score("New Score");
-			Part part1 = new Part("Snare", 1, 0);
+			Part part1 = new Part(jm.constants.DrumMap.ACOUSTIC_SNARE);
 			Phrase phrase1 = new Phrase(0.0);
 			Note note1 = new Note(46, 1);
-			Note note2 = new Note(36,2);
+			Note note2 = new Note(50, 2);
+			Note note3 = new Note(50,.5);
 			phrase1.add(note1);
 			phrase1.add(note2);
+			phrase1.add(note3);
 			part1.addPhrase(phrase1);
 			score.addPart(part1);
 			ShowScore scoreFrame = new ShowScore(score);
