@@ -7,6 +7,12 @@ import javax.swing.JMenu;
 import javax.swing.JToolBar;
 import javax.swing.filechooser.FileSystemView;
 
+import org.jfugue.midi.MidiFileManager;
+import org.jfugue.parser.Parser;
+import org.jfugue.pattern.Pattern;
+import org.jfugue.player.Player;
+import org.jfugue.integration.MusicXmlParser;
+
 import java.awt.BorderLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -93,7 +99,7 @@ public class MainWindow {
 				mntmLoad_Clicked(arg0);
 			}
 		});
-	
+	 
 		mntmSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mntmSaveAs_Clicked(arg0);
@@ -150,6 +156,15 @@ public class MainWindow {
 			Notate scoreFrame = new Notate(score, 0, 0);
 			scoreFrame.pack();
 			scoreFrame.setVisible(true);
+			/*String snare = "[ACOUSTIC_SNARE]s";
+			String bass = "[ACOUSTIC_BASS_DRUM]s";
+			String oHiHat = "[OPEN_HI_HAT]s";
+			String cHiHat = "[CLOSED_HI_HAT]s";
+			String ride = "[RIDE_CYMBAL_1]s";
+			String song = snare + " " + bass + " " + snare  + " " + bass + " " + snare + " " + bass + " " + snare;
+			Pattern pattern = new Pattern();
+			Player player = new Player();
+			player.play("V9 " + snare + " " + bass + " " + snare  + " " + bass + " " + snare + " " + bass + " " + snare);*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -162,7 +177,11 @@ public class MainWindow {
 			int retVal = fc.showOpenDialog(null);
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				//Handle file to load
+				Pattern pattern = new Pattern();
+				pattern = MidiFileManager.loadPatternFromMidi(file);//MusicXmlParser.parse(file);
+				Player player = new Player();
+				player.play(pattern);
+				System.out.println(pattern);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
