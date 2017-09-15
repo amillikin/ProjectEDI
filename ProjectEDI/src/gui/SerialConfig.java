@@ -1,100 +1,79 @@
 package gui;
 
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JToolBar;
-import javax.swing.border.LineBorder;
-import java.awt.Color;
-import javax.swing.SwingConstants;
-import javax.swing.JSplitPane;
-import com.jgoodies.forms.layout.FormLayout;
 import com.fazecast.jSerialComm.SerialPort;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.FormSpecs;
+
+import arduino.ArduinoCOM;
+import main.Instrument;
+import main.Instruments;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JComboBox;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
 import java.awt.event.ActionListener;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.awt.event.ItemEvent;
 
 public class SerialConfig extends JDialog {
-	private final JToolBar toolBar = new JToolBar();
-	private final JButton btnSave = new JButton("Save");
-	private final JButton btnLoad = new JButton("Load");
 	private final JLabel lblInstrument = new JLabel("Instrument");
 	private final JLabel lblPort = new JLabel("Port");
-	private final JLabel lblCh = new JLabel("CH");
+	private final JLabel lblCh = new JLabel("Enable Channels");
 	private final JLabel lblSendTest = new JLabel("Send Test");
-	private final JComboBox<String> cBoxInst1 = new JComboBox<String>();
-	private final JComboBox<String> cBoxInst2 = new JComboBox<String>();
-	private final JComboBox<String> cBoxInst3 = new JComboBox<String>();
-	private final JComboBox<String> cBoxInst4 = new JComboBox<String>();
-	private final JComboBox<String> cBoxInst5 = new JComboBox<String>();
-	private final JComboBox<String> cBoxInst6 = new JComboBox<String>();
-	private final JComboBox<String> cBoxInst7 = new JComboBox<String>();
-	private final JComboBox<String> cBoxInst8 = new JComboBox<String>();
-	private final JComboBox<String> cBoxInst9 = new JComboBox<String>();
-	private final JComboBox<String> cBoxInst10 = new JComboBox<String>();
-	private final JComboBox<String> cBoxPort1 = new JComboBox<String>();
-	private final JComboBox<String> cBoxPort2 = new JComboBox<String>();
-	private final JComboBox<String> cBoxPort3 = new JComboBox<String>();
-	private final JComboBox<String> cBoxPort4 = new JComboBox<String>();
-	private final JComboBox<String> cBoxPort5 = new JComboBox<String>();
-	private final JComboBox<String> cBoxPort6 = new JComboBox<String>();
-	private final JComboBox<String> cBoxPort7 = new JComboBox<String>();
-	private final JComboBox<String> cBoxPort8 = new JComboBox<String>();
-	private final JComboBox<String> cBoxPort9 = new JComboBox<String>();
-	private final JComboBox<String> cBoxPort10 = new JComboBox<String>();
-	private final JCheckBox chkA1 = new JCheckBox("A");
-	private final JCheckBox chkA2 = new JCheckBox("A");
-	private final JCheckBox chkA3 = new JCheckBox("A");
-	private final JCheckBox chkA4 = new JCheckBox("A");
-	private final JCheckBox chkA5 = new JCheckBox("A");
-	private final JCheckBox chkA6 = new JCheckBox("A");
-	private final JCheckBox chkA7 = new JCheckBox("A");
-	private final JCheckBox chkA8 = new JCheckBox("A");
-	private final JCheckBox chkA9 = new JCheckBox("A");
-	private final JCheckBox chkA10 = new JCheckBox("A");
-	private final JCheckBox chkB1 = new JCheckBox("B");
-	private final JCheckBox chkB2 = new JCheckBox("B");
-	private final JCheckBox chkB3 = new JCheckBox("B");
-	private final JCheckBox chkB4 = new JCheckBox("B");
-	private final JCheckBox chkB5 = new JCheckBox("B");
-	private final JCheckBox chkB6 = new JCheckBox("B");
-	private final JCheckBox chkB7 = new JCheckBox("B");
-	private final JCheckBox chkB8 = new JCheckBox("B");
-	private final JCheckBox chkB9 = new JCheckBox("B");
-	private final JCheckBox chkB10 = new JCheckBox("B");
-	private final JButton btnSendTest1 = new JButton("SEND");
-	private final JButton btnSendTest2 = new JButton("SEND");
-	private final JButton btnSendTest3 = new JButton("SEND");
-	private final JButton btnSendTest4 = new JButton("SEND");
-	private final JButton btnSendTest5 = new JButton("SEND");
-	private final JButton btnSendTest6 = new JButton("SEND");
-	private final JButton btnSendTest7 = new JButton("SEND");
-	private final JButton btnSendTest8 = new JButton("SEND");
-	private final JButton btnSendTest9 = new JButton("SEND");
-	private final JButton btnSendTest10 = new JButton("SEND");
+	private final JComboBox<String> cBoxPortSnare = new JComboBox<String>();
+	private final JComboBox<String> cBoxPortCHiHat = new JComboBox<String>();
+	private final JComboBox<String> cBoxPortOHiHat = new JComboBox<String>();
+	private final JComboBox<String> cBoxPortBass = new JComboBox<String>();
+	private final JComboBox<String> cBoxPortToms = new JComboBox<String>();
+	private final JComboBox<String> cBoxPortCymbals = new JComboBox<String>();
+	private final JCheckBox chkEnSnareA = new JCheckBox("A");
+	private final JCheckBox chkEnCHiHatA = new JCheckBox("A");
+	private final JCheckBox chkEnOHiHatA = new JCheckBox("A");
+	private final JCheckBox chkEnBassA = new JCheckBox("A");
+	private final JCheckBox chkEnTomsA = new JCheckBox("A");
+	private final JCheckBox chkEnCymbalsA = new JCheckBox("A");
+	private final JCheckBox chkEnSnareB = new JCheckBox("B");
+	private final JCheckBox chkEnCHiHatB = new JCheckBox("B");
+	private final JCheckBox chkEnOHiHatB = new JCheckBox("B");
+	private final JCheckBox chkEnBassB = new JCheckBox("B");
+	private final JCheckBox chkEnTomsB = new JCheckBox("B");
+	private final JCheckBox chkEnCymbalsB = new JCheckBox("B");
+	private final JButton btnSendTestSnare = new JButton("SEND");
+	private final JButton btnSendTestCHiHat = new JButton("SEND");
+	private final JButton btnSendTestOHiHat = new JButton("SEND");
+	private final JButton btnSendTestBass = new JButton("SEND");
+	private final JButton btnSendTestToms = new JButton("SEND");
+	private final JButton btnSendTestCymbals = new JButton("SEND");
 	private final JPanel buttonPane = new JPanel();
-	private final JButton okButton = new JButton("OK");
-	private final JButton cancelButton = new JButton("Cancel");
+	private final JButton btnOK = new JButton("OK");
+	private final JButton btnCancel = new JButton("Cancel");
+	private final JLabel lblSnare = new JLabel("Snare");
+	private final JLabel lblCHiHat = new JLabel("Closed Hi-Hat");
+	private final JLabel lblOHiHat = new JLabel("Open Hi-Hat");
+	private final JLabel lblBass = new JLabel("Bass");
+	private final JLabel lblToms = new JLabel("Low Tom (A) High Tom (B)");
+	private final JLabel lblRideaCrash = new JLabel("Ride (A) Crash (B)");
 	
 	private static SerialPort[] comPort = SerialPort.getCommPorts();
-	private static final String[] instrumentList = new String[] {"","Snare","Tom","Hi-hat","Bass","Ride Cymbal","Crash Cymbal"};
+	protected Instruments instruments = new Instruments();
+	private final List<Integer> snareNotes = new ArrayList<Integer>(Stream.of(38,40).collect(Collectors.toList()));
+	private final List<Integer> cHiHatNotes = new ArrayList<Integer>(Stream.of(42,44).collect(Collectors.toList()));
+	private final List<Integer> oHiHatNotes = new ArrayList<Integer>(Stream.of(46).collect(Collectors.toList()));
+	private final List<Integer> bassNotes = new ArrayList<Integer>(Stream.of(35,36).collect(Collectors.toList()));
+	private final List<Integer> lowTomNotes = new ArrayList<Integer>(Stream.of(41,45,47).collect(Collectors.toList()));
+	private final List<Integer> highTomNotes = new ArrayList<Integer>(Stream.of(43,50,48).collect(Collectors.toList()));
+	private final List<Integer> rideNotes = new ArrayList<Integer>(Stream.of(49,57).collect(Collectors.toList()));
+	private final List<Integer> crashNotes = new ArrayList<Integer>(Stream.of(51,59).collect(Collectors.toList()));
 	
 	public SerialConfig() {
 		initialize();
@@ -102,671 +81,552 @@ public class SerialConfig extends JDialog {
 	
 	private void initialize() {
 		setTitle("Serial Port Configuration");
-		setBounds(100, 100, 450, 450);
+		setBounds(100, 100, 430, 280);
 		setResizable(false);
-		getContentPane().setLayout(new MigLayout("", "[grow][grow][][]", "[33px][][][][][][][][][][][][][]"));		
-		getContentPane().add(toolBar, "flowx,cell 0 0");
-		getContentPane().add(buttonPane, "cell 0 13,alignx left,aligny top");
-		getContentPane().add(lblInstrument, "cell 0 1,alignx center,aligny center");
-		getContentPane().add(lblPort, "cell 1 1,alignx center,aligny center");
-		getContentPane().add(lblCh, "cell 2 1,alignx center,aligny center");
-		getContentPane().add(lblSendTest, "cell 3 1,alignx center,aligny center");
-		getContentPane().add(cBoxInst1, "cell 0 2,growx");
-		getContentPane().add(cBoxInst2, "cell 0 3,growx");
-		getContentPane().add(cBoxInst3, "cell 0 4,growx");
-		getContentPane().add(cBoxInst4, "cell 0 5,growx");
-		getContentPane().add(cBoxInst5, "cell 0 6,growx");
-		getContentPane().add(cBoxInst6, "cell 0 7,growx");
-		getContentPane().add(cBoxInst7, "cell 0 8,growx");
-		getContentPane().add(cBoxInst8, "cell 0 9,growx");
-		getContentPane().add(cBoxInst9, "cell 0 10,growx");
-		getContentPane().add(cBoxInst10, "cell 0 11,growx");
-		getContentPane().add(cBoxPort1, "cell 1 2,growx");
-		getContentPane().add(cBoxPort2, "cell 1 3,growx");
-		getContentPane().add(cBoxPort3, "cell 1 4,growx");
-		getContentPane().add(cBoxPort4, "cell 1 5,growx");
-		getContentPane().add(cBoxPort5, "cell 1 6,growx");
-		getContentPane().add(cBoxPort6, "cell 1 7,growx");
-		getContentPane().add(cBoxPort7, "cell 1 8,growx");
-		getContentPane().add(cBoxPort8, "cell 1 9,growx");
-		getContentPane().add(cBoxPort9, "cell 1 10,growx");
-		getContentPane().add(cBoxPort10, "cell 1 11,growx");
-		getContentPane().add(chkA1, "flowx,cell 2 2");
-		getContentPane().add(chkA2, "flowx,cell 2 3");
-		getContentPane().add(chkA3, "flowx,cell 2 4");
-		getContentPane().add(chkA4, "flowx,cell 2 5");
-		getContentPane().add(chkA5, "flowx,cell 2 6");
-		getContentPane().add(chkA6, "flowx,cell 2 7");
-		getContentPane().add(chkA7, "flowx,cell 2 8");
-		getContentPane().add(chkA8, "flowx,cell 2 9");
-		getContentPane().add(chkA9, "flowx,cell 2 10");
-		getContentPane().add(chkA10, "flowx,cell 2 11");
-		getContentPane().add(chkB1, "cell 2 2");
-		getContentPane().add(chkB2, "cell 2 3");
-		getContentPane().add(chkB3, "cell 2 4");
-		getContentPane().add(chkB4, "cell 2 5");
-		getContentPane().add(chkB5, "cell 2 6");
-		getContentPane().add(chkB6, "cell 2 7");
-		getContentPane().add(chkB7, "cell 2 8");
-		getContentPane().add(chkB8, "cell 2 9");
-		getContentPane().add(chkB9, "cell 2 10");
-		getContentPane().add(chkB10, "cell 2 11");
-		getContentPane().add(btnSendTest1, "cell 3 2");
-		getContentPane().add(btnSendTest2, "cell 3 3");
-		getContentPane().add(btnSendTest3, "cell 3 4");
-		getContentPane().add(btnSendTest4, "cell 3 5");
-		getContentPane().add(btnSendTest5, "cell 3 6");
-		getContentPane().add(btnSendTest6, "cell 3 7");
-		getContentPane().add(btnSendTest7, "cell 3 8");
-		getContentPane().add(btnSendTest8, "cell 3 9");
-		getContentPane().add(btnSendTest9, "cell 3 10");
-		getContentPane().add(btnSendTest10, "cell 3 11");
+		getContentPane().setLayout(new MigLayout("", "[198.00][78.00][110.00][]", "[][30.00][][][][][][][]"));
+		lblSnare.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		getContentPane().add(lblSnare, "cell 0 1,alignx center,aligny center");
+		lblCHiHat.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		getContentPane().add(lblCHiHat, "cell 0 2,alignx center,aligny center");
+		lblOHiHat.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		getContentPane().add(lblOHiHat, "cell 0 3,alignx center,aligny center");
+		lblBass.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		getContentPane().add(lblBass, "cell 0 4,alignx center,aligny center");
+		lblToms.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		getContentPane().add(lblToms, "cell 0 5,alignx center,aligny center");
+		lblRideaCrash.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		getContentPane().add(lblRideaCrash, "cell 0 6,alignx center");
+		getContentPane().add(buttonPane, "cell 0 8,alignx left,aligny top");
+		getContentPane().add(lblInstrument, "cell 0 0,alignx center,aligny center");
+		getContentPane().add(lblPort, "cell 2 0,alignx center,aligny center");
+		getContentPane().add(lblCh, "cell 1 0,alignx center,aligny center");
+		getContentPane().add(lblSendTest, "cell 3 0,alignx center,aligny center");
+		getContentPane().add(cBoxPortSnare, "cell 2 1,growx");
+		getContentPane().add(cBoxPortCHiHat, "cell 2 2,growx");
+		getContentPane().add(cBoxPortOHiHat, "cell 2 3,growx");
+		getContentPane().add(cBoxPortBass, "cell 2 4,growx");
+		getContentPane().add(cBoxPortToms, "cell 2 5,growx");
+		getContentPane().add(cBoxPortCymbals, "cell 2 6,growx");
+		getContentPane().add(chkEnSnareA, "flowx,cell 1 1,alignx center,aligny center");
+		getContentPane().add(chkEnCHiHatA, "flowx,cell 1 2,alignx center,aligny center");
+		getContentPane().add(chkEnOHiHatA, "flowx,cell 1 3,alignx center,aligny center");
+		getContentPane().add(chkEnBassA, "flowx,cell 1 4,alignx center,aligny center");
+		getContentPane().add(chkEnTomsA, "flowx,cell 1 5,alignx center,aligny center");
+		getContentPane().add(chkEnCymbalsA, "flowx,cell 1 6,alignx center,aligny center");
+		getContentPane().add(chkEnSnareB, "cell 1 1");
+		getContentPane().add(chkEnCHiHatB, "cell 1 2");
+		getContentPane().add(chkEnOHiHatB, "cell 1 3");
+		getContentPane().add(chkEnBassB, "cell 1 4");
+		getContentPane().add(chkEnTomsB, "cell 1 5");
+		getContentPane().add(chkEnCymbalsB, "cell 1 6");
+		getContentPane().add(btnSendTestSnare, "cell 3 1");
+		getContentPane().add(btnSendTestCHiHat, "cell 3 2");
+		getContentPane().add(btnSendTestOHiHat, "cell 3 3");
+		getContentPane().add(btnSendTestBass, "cell 3 4");
+		getContentPane().add(btnSendTestToms, "cell 3 5");
+		getContentPane().add(btnSendTestCymbals, "cell 3 6");
 		
 		lblInstrument.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPort.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblCh.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblSendTest.setFont(new Font("Tahoma", Font.BOLD, 11));
-		cBoxPort1.setEnabled(false);
-		cBoxPort2.setEnabled(false);
-		cBoxPort3.setEnabled(false);
-		cBoxPort4.setEnabled(false);
-		cBoxPort5.setEnabled(false);
-		cBoxPort6.setEnabled(false);
-		cBoxPort7.setEnabled(false);
-		cBoxPort8.setEnabled(false);
-		cBoxPort9.setEnabled(false);
-		cBoxPort10.setEnabled(false);
-		cBoxPort1.addItem("");
-		cBoxPort2.addItem("");
-		cBoxPort3.addItem("");
-		cBoxPort4.addItem("");
-		cBoxPort5.addItem("");
-		cBoxPort6.addItem("");
-		cBoxPort7.addItem("");
-		cBoxPort8.addItem("");
-		cBoxPort9.addItem("");
-		cBoxPort10.addItem("");
-		chkA1.setEnabled(false);
-		chkA2.setEnabled(false);
-		chkA3.setEnabled(false);
-		chkA4.setEnabled(false);
-		chkA5.setEnabled(false);
-		chkA6.setEnabled(false);
-		chkA7.setEnabled(false);
-		chkA8.setEnabled(false);
-		chkA9.setEnabled(false);
-		chkA10.setEnabled(false);
-		chkB1.setEnabled(false);
-		chkB2.setEnabled(false);
-		chkB3.setEnabled(false);
-		chkB4.setEnabled(false);
-		chkB5.setEnabled(false);
-		chkB6.setEnabled(false);
-		chkB7.setEnabled(false);
-		chkB8.setEnabled(false);
-		chkB9.setEnabled(false);
-		chkB10.setEnabled(false);
-		btnSendTest1.setEnabled(false);
-		btnSendTest2.setEnabled(false);
-		btnSendTest3.setEnabled(false);
-		btnSendTest4.setEnabled(false);
-		btnSendTest5.setEnabled(false);
-		btnSendTest6.setEnabled(false);
-		btnSendTest7.setEnabled(false);
-		btnSendTest8.setEnabled(false);
-		btnSendTest9.setEnabled(false);
-		btnSendTest10.setEnabled(false);
-		toolBar.setFloatable(false);
-		toolBar.add(btnSave);
-		toolBar.add(btnLoad);
+		cBoxPortSnare.setEnabled(false);
+		cBoxPortCHiHat.setEnabled(false);
+		cBoxPortOHiHat.setEnabled(false);
+		cBoxPortBass.setEnabled(false);
+		cBoxPortToms.setEnabled(false);
+		cBoxPortCymbals.setEnabled(false);
+		cBoxPortSnare.addItem("");
+		cBoxPortCHiHat.addItem("");
+		cBoxPortOHiHat.addItem("");
+		cBoxPortBass.addItem("");
+		cBoxPortToms.addItem("");
+		cBoxPortCymbals.addItem("");
+		btnSendTestSnare.setEnabled(false);
+		btnSendTestCHiHat.setEnabled(false);
+		btnSendTestOHiHat.setEnabled(false);
+		btnSendTestBass.setEnabled(false);
+		btnSendTestToms.setEnabled(false);
+		btnSendTestCymbals.setEnabled(false);
 		
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		okButton.setActionCommand("OK");
-		buttonPane.add(okButton);
-		getRootPane().setDefaultButton(okButton);
-		cancelButton.setActionCommand("Cancel");
-		buttonPane.add(cancelButton);
+		btnOK.setActionCommand("OK");
+		buttonPane.add(btnOK);
+		getRootPane().setDefaultButton(btnOK);
+		btnCancel.setActionCommand("Cancel");
+		buttonPane.add(btnCancel);
 		
-		updateInstruments();
-		updateSerialPorts();
-		
-		cBoxInst1.addItemListener(new ItemListener() {
+		cBoxPortSnare.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxInst1.getSelectedItem() != "") {
-					cBoxPort1.setEnabled(true);
+				updateSerialPorts(1);
+				if (cBoxPortSnare.getSelectedItem() != "") {
+					btnSendTestSnare.setEnabled(true);
 				} else {
-					cBoxPort1.setSelectedIndex(0);
-					cBoxPort1.setEnabled(false);
+					btnSendTestSnare.setEnabled(false);
 				}
 			}
 		});
-		cBoxInst2.addItemListener(new ItemListener() {
+		cBoxPortCHiHat.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxInst2.getSelectedItem() != "") {
-					cBoxPort2.setEnabled(true);
+				updateSerialPorts(2);
+				if (cBoxPortCHiHat.getSelectedItem() != "") {
+					btnSendTestCHiHat.setEnabled(true);
 				} else {
-					cBoxPort2.setEnabled(false);
-					cBoxPort2.setSelectedIndex(0);
+					btnSendTestCHiHat.setEnabled(false);
 				}
 			}
 		});
-		cBoxInst3.addItemListener(new ItemListener() {
+		cBoxPortOHiHat.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxInst3.getSelectedItem() != "") {
-					cBoxPort3.setEnabled(true);
+				updateSerialPorts(3);
+				if (cBoxPortOHiHat.getSelectedItem() != "") {
+					btnSendTestOHiHat.setEnabled(true);
 				} else {
-					cBoxPort3.setSelectedIndex(0);
-					cBoxPort3.setEnabled(false);
+					btnSendTestOHiHat.setEnabled(false);
 				}
 			}
 		});
-		cBoxInst4.addItemListener(new ItemListener() {
+		cBoxPortBass.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxInst4.getSelectedItem() != "") {
-					cBoxPort4.setEnabled(true);
+				updateSerialPorts(4);
+				if (cBoxPortBass.getSelectedItem() != "") {
+					btnSendTestBass.setEnabled(true);
 				} else {
-					cBoxPort4.setSelectedIndex(0);
-					cBoxPort4.setEnabled(false);
+					btnSendTestBass.setEnabled(false);
 				}
 			}
 		});
-		cBoxInst5.addItemListener(new ItemListener() {
+		cBoxPortToms.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxInst5.getSelectedItem() != "") {
-					cBoxPort5.setEnabled(true);
+				updateSerialPorts(5);
+				if (cBoxPortToms.getSelectedItem() != "") {
+					btnSendTestToms.setEnabled(true);
 				} else {
-					cBoxPort5.setSelectedIndex(0);
-					cBoxPort5.setEnabled(false);
+					btnSendTestToms.setEnabled(false);
 				}
 			}
 		});
-		cBoxInst6.addItemListener(new ItemListener() {
+		cBoxPortCymbals.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxInst6.getSelectedItem() != "") {
-					cBoxPort6.setEnabled(true);
+				updateSerialPorts(6);
+				if (cBoxPortCymbals.getSelectedItem() != "") {
+					btnSendTestCymbals.setEnabled(true);
 				} else {
-					cBoxPort6.setSelectedIndex(0);
-					cBoxPort6.setEnabled(false);
-				}
-			}
-		});
-		cBoxInst7.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxInst7.getSelectedItem() != "") {
-					cBoxPort7.setEnabled(true);
-				} else {
-					cBoxPort7.setSelectedIndex(0);
-					cBoxPort7.setEnabled(false);
-				}
-			}
-		});
-		cBoxInst8.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxInst8.getSelectedItem() != "") {
-					cBoxPort8.setEnabled(true);
-				} else {
-					cBoxPort8.setSelectedIndex(0);
-					cBoxPort8.setEnabled(false);
-				}
-			}
-		});
-		cBoxInst9.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxInst9.getSelectedItem() != "") {
-					cBoxPort9.setEnabled(true);
-				} else {
-					cBoxPort9.setSelectedIndex(0);
-					cBoxPort9.setEnabled(false);
-				}
-			}
-		});
-		cBoxInst10.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxInst10.getSelectedItem() != "") {
-					cBoxPort10.setEnabled(true);
-				} else {
-					cBoxPort10.setSelectedIndex(0);
-					cBoxPort10.setEnabled(false);
-				}
-			}
-		});
-		
-		cBoxPort1.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxPort1.getSelectedItem() != "") {
-					chkA1.setEnabled(true);
-					chkB1.setEnabled(true);
-				} else {
-					chkA1.setSelected(false);
-					chkB1.setSelected(false);
-					chkA1.setEnabled(false);
-					chkB1.setEnabled(false);
-				}
-			}
-		});
-		cBoxPort2.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxPort2.getSelectedItem() != "") {
-					chkA2.setEnabled(true);
-					chkB2.setEnabled(true);
-				} else {
-					chkA2.setSelected(false);
-					chkB2.setSelected(false);
-					chkA2.setEnabled(false);
-					chkB2.setEnabled(false);
-				}
-			}
-		});
-		cBoxPort3.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxPort3.getSelectedItem() != "") {
-					chkA3.setEnabled(true);
-					chkB3.setEnabled(true);
-				} else {
-					chkA3.setSelected(false);
-					chkB3.setSelected(false);
-					chkA3.setEnabled(false);
-					chkB3.setEnabled(false);
-				}
-			}
-		});
-		cBoxPort4.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxPort4.getSelectedItem() != "") {
-					chkA4.setEnabled(true);
-					chkB4.setEnabled(true);
-				} else {
-					chkA4.setSelected(false);
-					chkB4.setSelected(false);
-					chkA4.setEnabled(false);
-					chkB4.setEnabled(false);
-				}
-			}
-		});
-		cBoxPort5.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxPort5.getSelectedItem() != "") {
-					chkA5.setEnabled(true);
-					chkB5.setEnabled(true);
-				} else {
-					chkA5.setSelected(false);
-					chkB5.setSelected(false);
-					chkA5.setEnabled(false);
-					chkB5.setEnabled(false);
-				}
-			}
-		});
-		cBoxPort6.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxPort6.getSelectedItem() != "") {
-					chkA6.setEnabled(true);
-					chkB6.setEnabled(true);
-				} else {
-					chkA6.setSelected(false);
-					chkB6.setSelected(false);
-					chkA6.setEnabled(false);
-					chkB6.setEnabled(false);
-				}
-			}
-		});
-		cBoxPort7.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxPort7.getSelectedItem() != "") {
-					chkA7.setEnabled(true);
-					chkB7.setEnabled(true);
-				} else {
-					chkA7.setSelected(false);
-					chkB7.setSelected(false);
-					chkA7.setEnabled(false);
-					chkB7.setEnabled(false);
-				}
-			}
-		});
-		cBoxPort8.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxPort8.getSelectedItem() != "") {
-					chkA8.setEnabled(true);
-					chkB8.setEnabled(true);
-				} else {
-					chkA8.setSelected(false);
-					chkB8.setSelected(false);
-					chkA8.setEnabled(false);
-					chkB8.setEnabled(false);
-				}
-			}
-		});
-		cBoxPort9.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxPort9.getSelectedItem() != "") {
-					chkA9.setEnabled(true);
-					chkB9.setEnabled(true);
-				} else {
-					chkA9.setSelected(false);
-					chkB9.setSelected(false);
-					chkA9.setEnabled(false);
-					chkB9.setEnabled(false);
-				}
-			}
-		});
-		cBoxPort10.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (cBoxPort10.getSelectedItem() != "") {
-					chkA10.setEnabled(true);
-					chkB10.setEnabled(true);
-				} else {
-					chkA10.setSelected(false);
-					chkB10.setSelected(false);
-					chkA10.setEnabled(false);
-					chkB10.setEnabled(false);
+					btnSendTestCymbals.setEnabled(false);
 				}
 			}
 		});
 		
 
-		chkA1.addItemListener(new ItemListener() {
+		chkEnSnareA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA1.isSelected() || chkB1.isSelected()) {
-					btnSendTest1.setEnabled(true);
+				if ((chkEnSnareA.isSelected() || chkEnSnareB.isSelected()) && !(cBoxPortSnare.isEnabled())) {
+					cBoxPortSnare.setEnabled(true);
 				} else {
-					btnSendTest1.setEnabled(false);
+					cBoxPortSnare.setEnabled(false);
 				}
 			}
 		});
-		chkA2.addItemListener(new ItemListener() {
+		chkEnSnareB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA2.isSelected() || chkB2.isSelected()) {
-					btnSendTest2.setEnabled(true);
+				if ((chkEnSnareA.isSelected() || chkEnSnareB.isSelected()) && !(cBoxPortSnare.isEnabled())) {
+					cBoxPortSnare.setEnabled(true);
 				} else {
-					btnSendTest2.setEnabled(false);
+					cBoxPortSnare.setEnabled(false);
 				}
 			}
 		});
-		chkA3.addItemListener(new ItemListener() {
+		chkEnCHiHatA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA3.isSelected() || chkB3.isSelected()) {
-					btnSendTest3.setEnabled(true);
+				if ((chkEnCHiHatA.isSelected() || chkEnCHiHatB.isSelected()) && !(cBoxPortCHiHat.isEnabled())) {
+					cBoxPortCHiHat.setEnabled(true);
 				} else {
-					btnSendTest3.setEnabled(false);
+					cBoxPortCHiHat.setEnabled(false);
 				}
 			}
 		});
-		chkA4.addItemListener(new ItemListener() {
+		chkEnCHiHatB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA4.isSelected() || chkB4.isSelected()) {
-					btnSendTest4.setEnabled(true);
+				if ((chkEnCHiHatA.isSelected() || chkEnCHiHatB.isSelected()) && !(cBoxPortCHiHat.isEnabled())) {
+					cBoxPortCHiHat.setEnabled(true);
 				} else {
-					btnSendTest4.setEnabled(false);
+					cBoxPortCHiHat.setEnabled(false);
 				}
 			}
 		});
-		chkA5.addItemListener(new ItemListener() {
+		chkEnOHiHatA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA5.isSelected() || chkB5.isSelected()) {
-					btnSendTest5.setEnabled(true);
+				if ((chkEnOHiHatA.isSelected() || chkEnOHiHatB.isSelected()) && !(cBoxPortOHiHat.isEnabled())) {
+					cBoxPortOHiHat.setEnabled(true);
 				} else {
-					btnSendTest5.setEnabled(false);
+					cBoxPortOHiHat.setEnabled(false);
 				}
 			}
 		});
-		chkA6.addItemListener(new ItemListener() {
+		chkEnOHiHatB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA6.isSelected() || chkB6.isSelected()) {
-					btnSendTest6.setEnabled(true);
+				if ((chkEnOHiHatA.isSelected() || chkEnOHiHatB.isSelected()) && !(cBoxPortOHiHat.isEnabled())) {
+					cBoxPortOHiHat.setEnabled(true);
 				} else {
-					btnSendTest6.setEnabled(false);
+					cBoxPortOHiHat.setEnabled(false);
 				}
 			}
 		});
-		chkA7.addItemListener(new ItemListener() {
+		chkEnBassA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA7.isSelected() || chkB7.isSelected()) {
-					btnSendTest7.setEnabled(true);
+				if ((chkEnBassA.isSelected() || chkEnBassB.isSelected()) && !(cBoxPortBass.isEnabled())) {
+					cBoxPortBass.setEnabled(true);
 				} else {
-					btnSendTest7.setEnabled(false);
+					cBoxPortBass.setEnabled(false);
 				}
 			}
 		});
-		chkA8.addItemListener(new ItemListener() {
+		chkEnBassB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA8.isSelected() || chkB8.isSelected()) {
-					btnSendTest8.setEnabled(true);
+				if ((chkEnBassA.isSelected() || chkEnBassB.isSelected()) && !(cBoxPortBass.isEnabled())) {
+					cBoxPortBass.setEnabled(true);
 				} else {
-					btnSendTest8.setEnabled(false);
+					cBoxPortBass.setEnabled(false);
 				}
 			}
 		});
-		chkA9.addItemListener(new ItemListener() {
+		chkEnTomsA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA9.isSelected() || chkB9.isSelected()) {
-					btnSendTest9.setEnabled(true);
+				if ((chkEnTomsA.isSelected() || chkEnTomsB.isSelected()) && !(cBoxPortToms.isEnabled())) {
+					cBoxPortToms.setEnabled(true);
 				} else {
-					btnSendTest9.setEnabled(false);
+					cBoxPortToms.setEnabled(false);
 				}
 			}
 		});
-		chkA10.addItemListener(new ItemListener() {
+		chkEnTomsB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA10.isSelected() || chkB10.isSelected()) {
-					btnSendTest10.setEnabled(true);
+				if ((chkEnTomsA.isSelected() || chkEnTomsB.isSelected()) && !(cBoxPortToms.isEnabled())) {
+					cBoxPortToms.setEnabled(true);
 				} else {
-					btnSendTest10.setEnabled(false);
+					cBoxPortToms.setEnabled(false);
 				}
 			}
 		});
+		chkEnCymbalsA.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				if ((chkEnCymbalsA.isSelected() || chkEnCymbalsB.isSelected()) && !(cBoxPortCymbals.isEnabled())) {
+					cBoxPortCymbals.setEnabled(true);
+				} else {
+					cBoxPortCymbals.setEnabled(false);
+				}
+			}
+		});
+		chkEnCymbalsB.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				if ((chkEnCymbalsA.isSelected() || chkEnCymbalsB.isSelected()) && !(cBoxPortCymbals.isEnabled())) {
+					cBoxPortCymbals.setEnabled(true);
+				} else {
+					cBoxPortCymbals.setEnabled(false);
+				}
+			}
+		});
+		
+		
+		btnSendTestSnare.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (chkEnSnareA.isSelected() && chkEnSnareB.isSelected()) {
+					sendCOMTest(cBoxPortSnare.getSelectedItem().toString(), "BOTH");
+				} else if (chkEnSnareA.isSelected()) {
+					sendCOMTest(cBoxPortSnare.getSelectedItem().toString(), "A");
+				} else if (chkEnSnareB.isSelected()) {
+					sendCOMTest(cBoxPortSnare.getSelectedItem().toString(), "B");
+				}
+			}
+		});
+		btnSendTestCHiHat.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (chkEnCHiHatA.isSelected() && chkEnCHiHatB.isSelected()) {
+					sendCOMTest(cBoxPortCHiHat.getSelectedItem().toString(), "BOTH");
+				} else if (chkEnCHiHatA.isSelected()) {
+					sendCOMTest(cBoxPortCHiHat.getSelectedItem().toString(), "A");
+				} else if (chkEnCHiHatB.isSelected()) {
+					sendCOMTest(cBoxPortCHiHat.getSelectedItem().toString(), "B");
+				}
+			}
+		});
+		btnSendTestOHiHat.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (chkEnOHiHatA.isSelected() && chkEnOHiHatB.isSelected()) {
+					sendCOMTest(cBoxPortCHiHat.getSelectedItem().toString(), "BOTH");
+				} else if (chkEnOHiHatA.isSelected()) {
+					sendCOMTest(cBoxPortCHiHat.getSelectedItem().toString(), "A");
+				} else if (chkEnOHiHatB.isSelected()) {
+					sendCOMTest(cBoxPortCHiHat.getSelectedItem().toString(), "B");
+				}
+			}
+		});
+		btnSendTestBass.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (chkEnBassA.isSelected() && chkEnBassB.isSelected()) {
+					sendCOMTest(cBoxPortBass.getSelectedItem().toString(), "BOTH");
+				} else if (chkEnBassA.isSelected()) {
+					sendCOMTest(cBoxPortBass.getSelectedItem().toString(), "A");
+				} else if (chkEnBassB.isSelected()) {
+					sendCOMTest(cBoxPortBass.getSelectedItem().toString(), "B");
+				}
+			}
+		});
+		btnSendTestToms.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (chkEnTomsA.isSelected() && chkEnTomsB.isSelected()) {
+					sendCOMTest(cBoxPortToms.getSelectedItem().toString(), "BOTH");
+				} else if (chkEnTomsA.isSelected()) {
+					sendCOMTest(cBoxPortToms.getSelectedItem().toString(), "A");
+				} else if (chkEnTomsB.isSelected()) {
+					sendCOMTest(cBoxPortToms.getSelectedItem().toString(), "B");
+				}
+			}
+		});
+		btnSendTestCymbals.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (chkEnCymbalsA.isSelected() && chkEnCymbalsB.isSelected()) {
+					sendCOMTest(cBoxPortCymbals.getSelectedItem().toString(), "BOTH");
+				} else if (chkEnCymbalsA.isSelected()) {
+					sendCOMTest(cBoxPortCymbals.getSelectedItem().toString(), "A");
+				} else if (chkEnCymbalsB.isSelected()) {
+					sendCOMTest(cBoxPortCymbals.getSelectedItem().toString(), "B");
+				}
+			}
+		});
+		
+		btnOK.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Integer i = 0;
+				
+				if (chkEnSnareA.isSelected() && chkEnSnareB.isSelected()) {
+					Instrument snare = new Instrument(i, "Snare", cBoxPortSnare.getSelectedItem().toString(), "BOTH", snareNotes);
+					instruments.addInstrument(snare);
+					i++;
+				} else if (chkEnSnareA.isSelected()) {
+					Instrument snare = new Instrument(i, "Snare", cBoxPortSnare.getSelectedItem().toString(), "A", snareNotes);
+					instruments.addInstrument(snare);
+					i++;
+				} else if (chkEnSnareB.isSelected()) {
+					Instrument snare = new Instrument(i, "Snare", cBoxPortSnare.getSelectedItem().toString(), "B", snareNotes);
+					instruments.addInstrument(snare);
+					i++;
+				}
+				
+				if (chkEnCHiHatA.isSelected() && chkEnCHiHatB.isSelected()) {
+					Instrument cHiHat = new Instrument(i, "Closed Hi-Hat", cBoxPortCHiHat.getSelectedItem().toString(), "BOTH", cHiHatNotes);
+					instruments.addInstrument(cHiHat);
+					i++;
+				} else if (chkEnCHiHatA.isSelected()) {
+					Instrument cHiHat = new Instrument(i, "Closed Hi-Hat", cBoxPortCHiHat.getSelectedItem().toString(), "A", cHiHatNotes);
+					instruments.addInstrument(cHiHat);
+					i++;
+				} else if (chkEnCHiHatB.isSelected()) {
+					Instrument cHiHat = new Instrument(i, "Closed Hi-Hat", cBoxPortCHiHat.getSelectedItem().toString(), "B", cHiHatNotes);
+					instruments.addInstrument(cHiHat);
+					i++;
+				}
 
-		chkB1.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA1.isSelected() || chkB1.isSelected()) {
-					btnSendTest1.setEnabled(true);
-				} else {
-					btnSendTest1.setEnabled(false);
+
+				if (chkEnOHiHatA.isSelected() && chkEnOHiHatB.isSelected()) {
+					Instrument oHiHat = new Instrument(i, "Open Hi-Hat", cBoxPortOHiHat.getSelectedItem().toString(), "BOTH", oHiHatNotes);
+					instruments.addInstrument(oHiHat);
+					i++;
+				} else if (chkEnOHiHatA.isSelected()) {
+					Instrument oHiHat = new Instrument(i, "Open Hi-Hat", cBoxPortOHiHat.getSelectedItem().toString(), "A", oHiHatNotes);
+					instruments.addInstrument(oHiHat);
+					i++;
+				} else if (chkEnOHiHatB.isSelected()) {
+					Instrument oHiHat = new Instrument(i, "Open Hi-Hat", cBoxPortOHiHat.getSelectedItem().toString(), "B", oHiHatNotes);
+					instruments.addInstrument(oHiHat);
+					i++;
 				}
-			}
-		});
-		chkB2.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA2.isSelected() || chkB2.isSelected()) {
-					btnSendTest2.setEnabled(true);
-				} else {
-					btnSendTest2.setEnabled(false);
+				
+				if (chkEnBassA.isSelected() && chkEnBassB.isSelected()) {
+					Instrument bass = new Instrument(i, "Bass", cBoxPortBass.getSelectedItem().toString(), "BOTH", bassNotes);
+					instruments.addInstrument(bass);
+					i++;
+				} else if (chkEnBassA.isSelected()) {
+					Instrument bass = new Instrument(i, "Bass", cBoxPortBass.getSelectedItem().toString(), "A", bassNotes);
+					instruments.addInstrument(bass);
+					i++;
+				} else if (chkEnBassB.isSelected()) {
+					Instrument bass = new Instrument(i, "Bass", cBoxPortBass.getSelectedItem().toString(), "B", bassNotes);
+					instruments.addInstrument(bass);
+					i++;
 				}
-			}
-		});
-		chkB3.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA3.isSelected() || chkB3.isSelected()) {
-					btnSendTest3.setEnabled(true);
-				} else {
-					btnSendTest3.setEnabled(false);
+				
+				if (chkEnTomsA.isSelected() && chkEnTomsB.isSelected()) {
+					Instrument lowToms = new Instrument(i, "Low Tom", cBoxPortToms.getSelectedItem().toString(), "A", lowTomNotes);
+					instruments.addInstrument(lowToms);
+					i++;
+					Instrument highToms = new Instrument(i, "High Tom", cBoxPortToms.getSelectedItem().toString(), "B", highTomNotes);
+					instruments.addInstrument(highToms);
+					i++;
+				} else if (chkEnTomsA.isSelected()) {
+					Instrument lowToms = new Instrument(i, "Low Tom", cBoxPortToms.getSelectedItem().toString(), "A", lowTomNotes);
+					instruments.addInstrument(lowToms);
+					i++;
+				} else if (chkEnTomsB.isSelected()) {
+					Instrument highToms = new Instrument(i, "High Tom", cBoxPortToms.getSelectedItem().toString(), "B", highTomNotes);
+					instruments.addInstrument(highToms);
+					i++;
 				}
-			}
-		});
-		chkB4.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA4.isSelected() || chkB4.isSelected()) {
-					btnSendTest4.setEnabled(true);
-				} else {
-					btnSendTest4.setEnabled(false);
-				}
-			}
-		});
-		chkB5.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA5.isSelected() || chkB5.isSelected()) {
-					btnSendTest5.setEnabled(true);
-				} else {
-					btnSendTest5.setEnabled(false);
-				}
-			}
-		});
-		chkB6.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA6.isSelected() || chkB6.isSelected()) {
-					btnSendTest6.setEnabled(true);
-				} else {
-					btnSendTest6.setEnabled(false);
-				}
-			}
-		});
-		chkB7.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA7.isSelected() || chkB7.isSelected()) {
-					btnSendTest7.setEnabled(true);
-				} else {
-					btnSendTest7.setEnabled(false);
-				}
-			}
-		});
-		chkB8.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA8.isSelected() || chkB8.isSelected()) {
-					btnSendTest8.setEnabled(true);
-				} else {
-					btnSendTest8.setEnabled(false);
-				}
-			}
-		});
-		chkB9.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA9.isSelected() || chkB9.isSelected()) {
-					btnSendTest9.setEnabled(true);
-				} else {
-					btnSendTest9.setEnabled(false);
-				}
-			}
-		});
-		chkB10.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if (chkA10.isSelected() || chkB10.isSelected()) {
-					btnSendTest10.setEnabled(true);
-				} else {
-					btnSendTest10.setEnabled(false);
+				
+				if (chkEnCymbalsA.isSelected() && chkEnCymbalsB.isSelected()) {
+					Instrument ride = new Instrument(i, "Ride Cymbal", cBoxPortCymbals.getSelectedItem().toString(), "A", rideNotes);
+					instruments.addInstrument(ride);
+					i++;
+					Instrument crash = new Instrument(i, "Crash Cymbal", cBoxPortCymbals.getSelectedItem().toString(), "B", crashNotes);
+					instruments.addInstrument(crash);
+					i++;
+				} else if (chkEnCymbalsA.isSelected()) {
+					Instrument ride = new Instrument(i, "Ride Cymbal", cBoxPortCymbals.getSelectedItem().toString(), "A", rideNotes);
+					instruments.addInstrument(ride);
+					i++;
+				} else if (chkEnCymbalsB.isSelected()) {
+					Instrument crash = new Instrument(i, "Crash Cymbal", cBoxPortCymbals.getSelectedItem().toString(), "B", crashNotes);
+					instruments.addInstrument(crash);
+					i++;
 				}
 			}
 		});
 		
-		
-		btnSendTest1.addActionListener(new ActionListener() {
+		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				sendCOMTest(comPort[cBoxPort1.getSelectedIndex()-1], chkA1.isSelected(), chkB1.isSelected());
-			}
-		});
-		btnSendTest2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sendCOMTest(comPort[cBoxPort2.getSelectedIndex()-1], chkA2.isSelected(), chkB2.isSelected());
-			}
-		});
-		btnSendTest3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sendCOMTest(comPort[cBoxPort3.getSelectedIndex()-1], chkA3.isSelected(), chkB3.isSelected());
-			}
-		});
-		btnSendTest4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sendCOMTest(comPort[cBoxPort4.getSelectedIndex()-1], chkA4.isSelected(), chkB4.isSelected());
-			}
-		});
-		btnSendTest5.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sendCOMTest(comPort[cBoxPort5.getSelectedIndex()-1], chkA5.isSelected(), chkB5.isSelected());
-			}
-		});
-		btnSendTest6.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sendCOMTest(comPort[cBoxPort6.getSelectedIndex()-1], chkA6.isSelected(), chkB6.isSelected());
-			}
-		});
-		btnSendTest7.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sendCOMTest(comPort[cBoxPort7.getSelectedIndex()-1], chkA7.isSelected(), chkB7.isSelected());
-			}
-		});
-		btnSendTest8.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sendCOMTest(comPort[cBoxPort8.getSelectedIndex()-1], chkA8.isSelected(), chkB8.isSelected());
-			}
-		});
-		btnSendTest9.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sendCOMTest(comPort[cBoxPort9.getSelectedIndex()-1], chkA9.isSelected(), chkB9.isSelected());
-			}
-		});
-		btnSendTest10.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sendCOMTest(comPort[cBoxPort10.getSelectedIndex()-1], chkA10.isSelected(), chkB10.isSelected());
+				dispose();
 			}
 		});
 		
+		this.pack();
+
 	}
 	
-	private void updateInstruments() {
-		for (String instrument: instrumentList) {
-			cBoxInst1.addItem(instrument);
-		}
-		for (String instrument: instrumentList) {
-			cBoxInst2.addItem(instrument);
-		}
-		for (String instrument: instrumentList) {
-			cBoxInst3.addItem(instrument);
-		}
-		for (String instrument: instrumentList) {
-			cBoxInst4.addItem(instrument);
-		}
-		for (String instrument: instrumentList) {
-			cBoxInst5.addItem(instrument);
-		}
-		for (String instrument: instrumentList) {
-			cBoxInst6.addItem(instrument);
-		}
-		for (String instrument: instrumentList) {
-			cBoxInst7.addItem(instrument);
-		}
-		for (String instrument: instrumentList) {
-			cBoxInst8.addItem(instrument);
-		}
-		for (String instrument: instrumentList) {
-			cBoxInst9.addItem(instrument);
-		}
-		for (String instrument: instrumentList) {
-			cBoxInst10.addItem(instrument);
-		}
+	private void updateSerialPorts(Integer cBoxSelected) {
+		/* Cases:
+		 * 1:Snare
+		 * 2:Closed Hi-Hat
+		 * 3:Open Hi-Hat
+		 * 4:Bass
+		 * 5:Toms
+		 * 6:Cymbals
+		 * 
+		 * Saves selected item
+		 * Removes all items
+		 * Adds previously selected item back
+		 * Adds all items not currently selected
+		 */
+		String tempItem;
+		
+		switch (cBoxSelected) {
+			case 1:
+				tempItem = cBoxPortSnare.getSelectedItem().toString();
+				cBoxPortSnare.removeAllItems();
+				cBoxPortSnare.addItem(tempItem);
+				for (SerialPort port : comPort) {
+					if (!isPortSelected(port)) {
+						cBoxPortSnare.addItem(port.getSystemPortName());
+					}
+				}
+				break;
+				
+			case 2:
+				tempItem = cBoxPortCHiHat.getSelectedItem().toString();
+				cBoxPortCHiHat.removeAllItems();
+				cBoxPortCHiHat.addItem(tempItem);
+				for (SerialPort port : comPort) {
+					if (!isPortSelected(port)) {
+						cBoxPortCHiHat.addItem(port.getSystemPortName());
+					}
+				}
+				break;
+				
+			case 3:
+				tempItem = cBoxPortOHiHat.getSelectedItem().toString();
+				cBoxPortOHiHat.removeAllItems();
+				cBoxPortOHiHat.addItem(tempItem);
+				for (SerialPort port : comPort) {
+					if (!isPortSelected(port)) {
+						cBoxPortOHiHat.addItem(port.getSystemPortName());
+					}
+				}
+				break;
+				
+			case 4:
+				tempItem = cBoxPortBass.getSelectedItem().toString();
+				cBoxPortBass.removeAllItems();
+				cBoxPortBass.addItem(tempItem);
+				for (SerialPort port : comPort) {
+					if (!isPortSelected(port)) {
+						cBoxPortBass.addItem(port.getSystemPortName());
+					}
+				}
+				break;
+				
+			case 5:
+				tempItem = cBoxPortToms.getSelectedItem().toString();
+				cBoxPortToms.removeAllItems();
+				cBoxPortToms.addItem(tempItem);
+				for (SerialPort port : comPort) {
+					if (!isPortSelected(port)) {
+						cBoxPortToms.addItem(port.getSystemPortName());
+					}
+				}
+				break;
+				
+			case 6:
+				tempItem = cBoxPortCymbals.getSelectedItem().toString();
+				cBoxPortCymbals.removeAllItems();
+				cBoxPortCymbals.addItem(tempItem);
+				for (SerialPort port : comPort) {
+					if (!isPortSelected(port)) {
+						cBoxPortCymbals.addItem(port.getSystemPortName());
+					}
+				}
+				break;
+		}		
 	}
 	
-	private void updateSerialPorts() {
-		for (SerialPort port : comPort) {
-			cBoxPort1.addItem(port.getSystemPortName());
+	private boolean isPortSelected(SerialPort port) {
+		// Checks if a given port is already selected when repopulating port comboboxes
+		if (cBoxPortSnare.getSelectedItem().toString() == port.getSystemPortName()) {
+			return true;
+		}else if (cBoxPortCHiHat.getSelectedItem().toString() == port.getSystemPortName()) {
+			return true;
+		}else if (cBoxPortOHiHat.getSelectedItem().toString() == port.getSystemPortName()) {
+			return true;
+		}else if (cBoxPortBass.getSelectedItem().toString() == port.getSystemPortName()) {
+			return true;
+		}else if (cBoxPortToms.getSelectedItem().toString() == port.getSystemPortName()) {
+			return true;
+		}else if (cBoxPortCymbals.getSelectedItem().toString() == port.getSystemPortName()) {
+			return true;
+		}else {
+			return false;
 		}
-		for (SerialPort port : comPort) {
-			cBoxPort2.addItem(port.getSystemPortName());
-		}
-		for (SerialPort port : comPort) {
-			cBoxPort3.addItem(port.getSystemPortName());
-		}
-		for (SerialPort port : comPort) {
-			cBoxPort4.addItem(port.getSystemPortName());
-		}
-		for (SerialPort port : comPort) {
-			cBoxPort5.addItem(port.getSystemPortName());
-		}
-		for (SerialPort port : comPort) {
-			cBoxPort6.addItem(port.getSystemPortName());
-		}
-		for (SerialPort port : comPort) {
-			cBoxPort7.addItem(port.getSystemPortName());
-		}
-		for (SerialPort port : comPort) {
-			cBoxPort8.addItem(port.getSystemPortName());
-		}
-		for (SerialPort port : comPort) {
-			cBoxPort9.addItem(port.getSystemPortName());
-		}
-		for (SerialPort port : comPort) {
-			cBoxPort10.addItem(port.getSystemPortName());
-		}
+		
 	}
 	
-	private void sendCOMTest(SerialPort portToTest, boolean A, boolean B) {
-		//Send a test signal to the selected COM port
+	private void sendCOMTest(String portToTest, String channels) {
+		ArduinoCOM port = new ArduinoCOM(portToTest);
+		
+		port.openConnection();
+		
+		if (channels == "BOTH") {
+			port.serialWrite('C');
+		} else if (channels == "A" ) {
+			port.serialWrite('A');
+		}else if (channels == "B" ) {
+			port.serialWrite('B');
+		}
+		
+		port.closeConnection();
 	}
 }
 

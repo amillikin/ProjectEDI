@@ -1,5 +1,7 @@
 package arduino;
 
-public class ArduinoPatternProducer {
-	//TODO Produces an ArduinoPattern parsed from a jFugue Pattern
+public interface ArduinoPatternProducer {
+	
+	public ArduinoPattern getPattern();
+	
 }

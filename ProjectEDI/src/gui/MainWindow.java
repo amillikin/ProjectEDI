@@ -40,6 +40,8 @@ import jm.music.data.Note;
 import jm.music.data.Part;
 import jm.music.data.Phrase;
 import jm.music.data.Score;
+import main.Instruments;
+
 import javax.swing.JScrollPane;
 
 public class MainWindow {
@@ -55,10 +57,10 @@ public class MainWindow {
 	private final JMenuItem mntmMusic = new JMenuItem("Music");
 	private final JMenu mnOptions = new JMenu("Options");
 	private final JMenuItem mntmSerialComPort = new JMenuItem("Serial COM Port Configuration");
-	private final JMenuItem mntmNotationConfig = new JMenuItem("Staff Notatition Configuration");
 	private final JMenu mnHelp = new JMenu("Help");
 	private final JMenuItem mntmAbout = new JMenuItem("About");
 	private final JScrollPane scrollPane = new JScrollPane();
+	private static Instruments instruments = new Instruments();
 	
 	public MainWindow() {
 		initialize();
@@ -83,7 +85,6 @@ public class MainWindow {
 		
 		menuBar.add(mnOptions);
 		mnOptions.add(mntmSerialComPort);
-		mnOptions.add(mntmNotationConfig);
 		
 		menuBar.add(mnHelp);
 		mnHelp.add(mntmAbout);
@@ -115,12 +116,6 @@ public class MainWindow {
 		mntmSerialComPort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mntmSerialComPort_Clicked(arg0);
-			}
-		});
-		
-		mntmNotationConfig.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mntmNotationConfig_Clicked(arg0);
 			}
 		});
 		
@@ -178,9 +173,9 @@ public class MainWindow {
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
 				Pattern pattern = new Pattern();
-				pattern = MidiFileManager.loadPatternFromMidi(file);//MusicXmlParser.parse(file);
-				Player player = new Player();
-				player.play(pattern);
+				//pattern = MusicXmlParser.parse(file);
+				//Player player = new Player();
+				//player.play(pattern);
 				System.out.println(pattern);
 			}
 		} catch (Exception e) {
@@ -218,17 +213,7 @@ public class MainWindow {
 			dialog.pack();
 			dialog.setModal(true);
 			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	private static void mntmNotationConfig_Clicked(ActionEvent arg0) {
-		try {
-			NotationConfig dialog = new NotationConfig();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.pack();
-			dialog.setModal(true);
-			dialog.setVisible(true);
+			//instruments = dialog.
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
