@@ -226,8 +226,8 @@ public class SerialConfig extends JDialog {
 
 		chkEnSnareA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnSnareA.isSelected() || chkEnSnareB.isSelected()) && !(cBoxPortSnare.isEnabled())) {
-					cBoxPortSnare.setEnabled(true);
+				if (chkEnSnareA.isSelected() || chkEnSnareB.isSelected()) {
+					if (!cBoxPortSnare.isEnabled()) cBoxPortSnare.setEnabled(true);
 				} else {
 					cBoxPortSnare.setEnabled(false);
 				}
@@ -235,8 +235,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnSnareB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnSnareA.isSelected() || chkEnSnareB.isSelected()) && !(cBoxPortSnare.isEnabled())) {
-					cBoxPortSnare.setEnabled(true);
+				if (chkEnSnareA.isSelected() || chkEnSnareB.isSelected()) {
+					if (!cBoxPortSnare.isEnabled()) cBoxPortSnare.setEnabled(true);
 				} else {
 					cBoxPortSnare.setEnabled(false);
 				}
@@ -244,8 +244,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnCHiHatA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnCHiHatA.isSelected() || chkEnCHiHatB.isSelected()) && !(cBoxPortCHiHat.isEnabled())) {
-					cBoxPortCHiHat.setEnabled(true);
+				if (chkEnCHiHatA.isSelected() || chkEnCHiHatB.isSelected()) {
+					if (!cBoxPortCHiHat.isEnabled()) cBoxPortCHiHat.setEnabled(true);
 				} else {
 					cBoxPortCHiHat.setEnabled(false);
 				}
@@ -253,8 +253,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnCHiHatB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnCHiHatA.isSelected() || chkEnCHiHatB.isSelected()) && !(cBoxPortCHiHat.isEnabled())) {
-					cBoxPortCHiHat.setEnabled(true);
+				if (chkEnCHiHatA.isSelected() || chkEnCHiHatB.isSelected()) {
+					if (!cBoxPortCHiHat.isEnabled()) cBoxPortCHiHat.setEnabled(true);
 				} else {
 					cBoxPortCHiHat.setEnabled(false);
 				}
@@ -262,8 +262,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnOHiHatA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnOHiHatA.isSelected() || chkEnOHiHatB.isSelected()) && !(cBoxPortOHiHat.isEnabled())) {
-					cBoxPortOHiHat.setEnabled(true);
+				if (chkEnOHiHatA.isSelected() || chkEnOHiHatB.isSelected()) {
+					if (!cBoxPortOHiHat.isEnabled()) cBoxPortOHiHat.setEnabled(true);
 				} else {
 					cBoxPortOHiHat.setEnabled(false);
 				}
@@ -271,8 +271,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnOHiHatB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnOHiHatA.isSelected() || chkEnOHiHatB.isSelected()) && !(cBoxPortOHiHat.isEnabled())) {
-					cBoxPortOHiHat.setEnabled(true);
+				if (chkEnOHiHatA.isSelected() || chkEnOHiHatB.isSelected()) {
+					if (!cBoxPortOHiHat.isEnabled()) cBoxPortOHiHat.setEnabled(true);
 				} else {
 					cBoxPortOHiHat.setEnabled(false);
 				}
@@ -280,8 +280,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnBassA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnBassA.isSelected() || chkEnBassB.isSelected()) && !(cBoxPortBass.isEnabled())) {
-					cBoxPortBass.setEnabled(true);
+				if (chkEnBassA.isSelected() || chkEnBassB.isSelected()) {
+					if (!cBoxPortBass.isEnabled()) cBoxPortBass.setEnabled(true);
 				} else {
 					cBoxPortBass.setEnabled(false);
 				}
@@ -289,8 +289,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnBassB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnBassA.isSelected() || chkEnBassB.isSelected()) && !(cBoxPortBass.isEnabled())) {
-					cBoxPortBass.setEnabled(true);
+				if (chkEnBassA.isSelected() || chkEnBassB.isSelected()) {
+					if (!cBoxPortBass.isEnabled()) cBoxPortBass.setEnabled(true);
 				} else {
 					cBoxPortBass.setEnabled(false);
 				}
@@ -298,8 +298,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnTomsA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnTomsA.isSelected() || chkEnTomsB.isSelected()) && !(cBoxPortToms.isEnabled())) {
-					cBoxPortToms.setEnabled(true);
+				if (chkEnTomsA.isSelected() || chkEnTomsB.isSelected()) {
+					if (!cBoxPortToms.isEnabled()) cBoxPortToms.setEnabled(true);
 				} else {
 					cBoxPortToms.setEnabled(false);
 				}
@@ -307,8 +307,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnTomsB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnTomsA.isSelected() || chkEnTomsB.isSelected()) && !(cBoxPortToms.isEnabled())) {
-					cBoxPortToms.setEnabled(true);
+				if (chkEnTomsA.isSelected() || chkEnTomsB.isSelected()) {
+					if (!cBoxPortToms.isEnabled()) cBoxPortToms.setEnabled(true);
 				} else {
 					cBoxPortToms.setEnabled(false);
 				}
@@ -316,8 +316,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnCymbalsA.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnCymbalsA.isSelected() || chkEnCymbalsB.isSelected()) && !(cBoxPortCymbals.isEnabled())) {
-					cBoxPortCymbals.setEnabled(true);
+				if (chkEnCymbalsA.isSelected() || chkEnCymbalsB.isSelected()) {
+					if (!cBoxPortCymbals.isEnabled()) cBoxPortCymbals.setEnabled(true);
 				} else {
 					cBoxPortCymbals.setEnabled(false);
 				}
@@ -325,8 +325,8 @@ public class SerialConfig extends JDialog {
 		});
 		chkEnCymbalsB.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				if ((chkEnCymbalsA.isSelected() || chkEnCymbalsB.isSelected()) && !(cBoxPortCymbals.isEnabled())) {
-					cBoxPortCymbals.setEnabled(true);
+				if (chkEnCymbalsA.isSelected() || chkEnCymbalsB.isSelected()) {
+					if (!cBoxPortCymbals.isEnabled()) cBoxPortCymbals.setEnabled(true);
 				} else {
 					cBoxPortCymbals.setEnabled(false);
 				}
