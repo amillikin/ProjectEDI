@@ -7,7 +7,7 @@ import java.util.Scanner;
 import com.fazecast.jSerialComm.SerialPort;
 
 public class ArduinoCOM {
-
+	//TODO: Create connection splash screen that waits for a "ready" byte value (R?) to come back from the Arduino.
 	private SerialPort comPort;
 	private String portDescription;
 	private int baud_rate;
@@ -17,9 +17,10 @@ public class ArduinoCOM {
 	}
 	public ArduinoCOM(String portDescription) {
 		//57600 baud rate assumed if not provided
-		this.baud_rate = 57600;
 		this.portDescription = portDescription;
 		comPort = SerialPort.getCommPort(this.portDescription);
+		this.baud_rate = 57600;
+		comPort.setBaudRate(this.baud_rate);
 	}
 	
 	public ArduinoCOM(String portDescription, int baud_rate) {
@@ -29,7 +30,7 @@ public class ArduinoCOM {
 		this.baud_rate = baud_rate;
 		comPort.setBaudRate(this.baud_rate);
 	}
-	
+
 	public boolean openConnection(){
 		if(comPort.openPort()){
 			try {Thread.sleep(100);} catch(Exception e){}
@@ -105,7 +106,8 @@ public class ArduinoCOM {
 		
 	}
 	public void serialWrite(String s,int noOfChars, int delay){
-		//writes the entire string at once.
+		//writes the entire string, 'noOfChars' characters at a time, 
+		//with a delay of 'delay' between each send.
 		comPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
 		try{Thread.sleep(5);} catch(Exception e){}
 		PrintWriter pout = new PrintWriter(comPort.getOutputStream());
@@ -121,18 +123,20 @@ public class ArduinoCOM {
 	}
 	
 	public void serialWrite(char c){
-		//writes the entire string at once.
+		//writes the character to output stream.
 		comPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
 		try{Thread.sleep(5);} catch(Exception e){}
-		PrintWriter pout = new PrintWriter(comPort.getOutputStream());pout.write(c);
+		PrintWriter pout = new PrintWriter(comPort.getOutputStream());
+		pout.write(c);
 		pout.flush();
 	}
 	
 	public void serialWrite(char c, int delay){
-		//writes the entire string at once.
+		//writes the character followed by a delay of 'delay' milliseconds.
 		comPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
-		try{Thread.sleep(5);} catch(Exception e){}
-		PrintWriter pout = new PrintWriter(comPort.getOutputStream());pout.write(c);
+		try{Thread.sleep(25);} catch(Exception e){}
+		PrintWriter pout = new PrintWriter(comPort.getOutputStream());
+		pout.write(c);
 		pout.flush();
 		try{Thread.sleep(delay);}catch(Exception e){}
 	}

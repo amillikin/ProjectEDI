@@ -26,6 +26,11 @@ import java.util.stream.Stream;
 import java.awt.event.ItemEvent;
 
 public class SerialConfig extends JDialog {
+	/*TODO: Need to add some sort of global handling for ports being disconnected/reconnected...
+	 *		Need to be able to preserve settings window after exiting...
+	 *		Add handling to parent that sets window with relevant information 
+	*/
+	
 	private final JLabel lblInstrument = new JLabel("Instrument");
 	private final JLabel lblPort = new JLabel("Port");
 	private final JLabel lblCh = new JLabel("Enable Channels");
@@ -64,8 +69,9 @@ public class SerialConfig extends JDialog {
 	private final JLabel lblToms = new JLabel("Low Tom (A) High Tom (B)");
 	private final JLabel lblRideaCrash = new JLabel("Ride (A) Crash (B)");
 	
-	private static SerialPort[] comPort = SerialPort.getCommPorts();
 	protected Instruments instruments = new Instruments();
+	
+	//Hardcoded lists of midi (Channel 10) notes for each instrument
 	private final List<Integer> snareNotes = new ArrayList<Integer>(Stream.of(38,40).collect(Collectors.toList()));
 	private final List<Integer> cHiHatNotes = new ArrayList<Integer>(Stream.of(42,44).collect(Collectors.toList()));
 	private final List<Integer> oHiHatNotes = new ArrayList<Integer>(Stream.of(46).collect(Collectors.toList()));
@@ -155,6 +161,10 @@ public class SerialConfig extends JDialog {
 		btnSendTestToms.setEnabled(false);
 		btnSendTestCymbals.setEnabled(false);
 		
+		//Currently disabled channels
+		chkEnOHiHatB.setEnabled(false);
+		chkEnBassB.setEnabled(false);
+		
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		btnOK.setActionCommand("OK");
 		buttonPane.add(btnOK);
@@ -164,7 +174,7 @@ public class SerialConfig extends JDialog {
 		
 		cBoxPortSnare.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				updateSerialPorts(1);
+				//updateSerialPorts(1);
 				if (cBoxPortSnare.getSelectedItem() != "") {
 					btnSendTestSnare.setEnabled(true);
 				} else {
@@ -229,8 +239,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnSnareA.isSelected() || chkEnSnareB.isSelected()) {
 					if (!cBoxPortSnare.isEnabled()) cBoxPortSnare.setEnabled(true);
 				} else {
+					cBoxPortSnare.removeAll();
+					cBoxPortSnare.addItem("");
 					cBoxPortSnare.setEnabled(false);
 				}
+				updateSerialPorts(1);
 			}
 		});
 		chkEnSnareB.addItemListener(new ItemListener() {
@@ -238,8 +251,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnSnareA.isSelected() || chkEnSnareB.isSelected()) {
 					if (!cBoxPortSnare.isEnabled()) cBoxPortSnare.setEnabled(true);
 				} else {
+					cBoxPortSnare.removeAll();
+					cBoxPortSnare.addItem("");
 					cBoxPortSnare.setEnabled(false);
 				}
+				updateSerialPorts(1);
 			}
 		});
 		chkEnCHiHatA.addItemListener(new ItemListener() {
@@ -247,8 +263,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnCHiHatA.isSelected() || chkEnCHiHatB.isSelected()) {
 					if (!cBoxPortCHiHat.isEnabled()) cBoxPortCHiHat.setEnabled(true);
 				} else {
+					cBoxPortCHiHat.removeAll();
+					cBoxPortCHiHat.addItem("");
 					cBoxPortCHiHat.setEnabled(false);
 				}
+				updateSerialPorts(2);
 			}
 		});
 		chkEnCHiHatB.addItemListener(new ItemListener() {
@@ -256,8 +275,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnCHiHatA.isSelected() || chkEnCHiHatB.isSelected()) {
 					if (!cBoxPortCHiHat.isEnabled()) cBoxPortCHiHat.setEnabled(true);
 				} else {
+					cBoxPortCHiHat.removeAll();
+					cBoxPortCHiHat.addItem("");
 					cBoxPortCHiHat.setEnabled(false);
 				}
+				updateSerialPorts(2);
 			}
 		});
 		chkEnOHiHatA.addItemListener(new ItemListener() {
@@ -265,8 +287,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnOHiHatA.isSelected() || chkEnOHiHatB.isSelected()) {
 					if (!cBoxPortOHiHat.isEnabled()) cBoxPortOHiHat.setEnabled(true);
 				} else {
+					cBoxPortOHiHat.removeAll();
+					cBoxPortOHiHat.addItem("");
 					cBoxPortOHiHat.setEnabled(false);
 				}
+				updateSerialPorts(3);
 			}
 		});
 		chkEnOHiHatB.addItemListener(new ItemListener() {
@@ -274,8 +299,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnOHiHatA.isSelected() || chkEnOHiHatB.isSelected()) {
 					if (!cBoxPortOHiHat.isEnabled()) cBoxPortOHiHat.setEnabled(true);
 				} else {
+					cBoxPortOHiHat.removeAll();
+					cBoxPortOHiHat.addItem("");
 					cBoxPortOHiHat.setEnabled(false);
 				}
+				updateSerialPorts(3);
 			}
 		});
 		chkEnBassA.addItemListener(new ItemListener() {
@@ -283,8 +311,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnBassA.isSelected() || chkEnBassB.isSelected()) {
 					if (!cBoxPortBass.isEnabled()) cBoxPortBass.setEnabled(true);
 				} else {
+					cBoxPortBass.removeAll();
+					cBoxPortBass.addItem("");
 					cBoxPortBass.setEnabled(false);
 				}
+				updateSerialPorts(4);
 			}
 		});
 		chkEnBassB.addItemListener(new ItemListener() {
@@ -292,8 +323,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnBassA.isSelected() || chkEnBassB.isSelected()) {
 					if (!cBoxPortBass.isEnabled()) cBoxPortBass.setEnabled(true);
 				} else {
+					cBoxPortBass.removeAll();
+					cBoxPortBass.addItem("");
 					cBoxPortBass.setEnabled(false);
 				}
+				updateSerialPorts(4);
 			}
 		});
 		chkEnTomsA.addItemListener(new ItemListener() {
@@ -301,8 +335,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnTomsA.isSelected() || chkEnTomsB.isSelected()) {
 					if (!cBoxPortToms.isEnabled()) cBoxPortToms.setEnabled(true);
 				} else {
+					cBoxPortToms.removeAll();
+					cBoxPortToms.addItem("");
 					cBoxPortToms.setEnabled(false);
 				}
+				updateSerialPorts(5);
 			}
 		});
 		chkEnTomsB.addItemListener(new ItemListener() {
@@ -310,8 +347,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnTomsA.isSelected() || chkEnTomsB.isSelected()) {
 					if (!cBoxPortToms.isEnabled()) cBoxPortToms.setEnabled(true);
 				} else {
+					cBoxPortToms.removeAll();
+					cBoxPortToms.addItem("");
 					cBoxPortToms.setEnabled(false);
 				}
+				updateSerialPorts(5);
 			}
 		});
 		chkEnCymbalsA.addItemListener(new ItemListener() {
@@ -319,8 +359,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnCymbalsA.isSelected() || chkEnCymbalsB.isSelected()) {
 					if (!cBoxPortCymbals.isEnabled()) cBoxPortCymbals.setEnabled(true);
 				} else {
+					cBoxPortCymbals.removeAll();
+					cBoxPortCymbals.addItem("");
 					cBoxPortCymbals.setEnabled(false);
 				}
+				updateSerialPorts(6);
 			}
 		});
 		chkEnCymbalsB.addItemListener(new ItemListener() {
@@ -328,8 +371,11 @@ public class SerialConfig extends JDialog {
 				if (chkEnCymbalsA.isSelected() || chkEnCymbalsB.isSelected()) {
 					if (!cBoxPortCymbals.isEnabled()) cBoxPortCymbals.setEnabled(true);
 				} else {
+					cBoxPortCymbals.removeAll();
+					cBoxPortCymbals.addItem("");
 					cBoxPortCymbals.setEnabled(false);
 				}
+				updateSerialPorts(6);
 			}
 		});
 		
@@ -495,6 +541,7 @@ public class SerialConfig extends JDialog {
 					instruments.addInstrument(crash);
 					i++;
 				}
+				dispose();
 			}
 		});
 		
@@ -522,14 +569,14 @@ public class SerialConfig extends JDialog {
 		 * Adds previously selected item back
 		 * Adds all items not currently selected
 		 */
-		String tempItem;
+		String tempItem;		
 		
 		switch (cBoxSelected) {
 			case 1:
 				tempItem = cBoxPortSnare.getSelectedItem().toString();
 				cBoxPortSnare.removeAllItems();
 				cBoxPortSnare.addItem(tempItem);
-				for (SerialPort port : comPort) {
+				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortSnare.addItem(port.getSystemPortName());
 					}
@@ -540,7 +587,7 @@ public class SerialConfig extends JDialog {
 				tempItem = cBoxPortCHiHat.getSelectedItem().toString();
 				cBoxPortCHiHat.removeAllItems();
 				cBoxPortCHiHat.addItem(tempItem);
-				for (SerialPort port : comPort) {
+				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortCHiHat.addItem(port.getSystemPortName());
 					}
@@ -551,7 +598,7 @@ public class SerialConfig extends JDialog {
 				tempItem = cBoxPortOHiHat.getSelectedItem().toString();
 				cBoxPortOHiHat.removeAllItems();
 				cBoxPortOHiHat.addItem(tempItem);
-				for (SerialPort port : comPort) {
+				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortOHiHat.addItem(port.getSystemPortName());
 					}
@@ -562,7 +609,7 @@ public class SerialConfig extends JDialog {
 				tempItem = cBoxPortBass.getSelectedItem().toString();
 				cBoxPortBass.removeAllItems();
 				cBoxPortBass.addItem(tempItem);
-				for (SerialPort port : comPort) {
+				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortBass.addItem(port.getSystemPortName());
 					}
@@ -573,7 +620,7 @@ public class SerialConfig extends JDialog {
 				tempItem = cBoxPortToms.getSelectedItem().toString();
 				cBoxPortToms.removeAllItems();
 				cBoxPortToms.addItem(tempItem);
-				for (SerialPort port : comPort) {
+				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortToms.addItem(port.getSystemPortName());
 					}
@@ -584,7 +631,7 @@ public class SerialConfig extends JDialog {
 				tempItem = cBoxPortCymbals.getSelectedItem().toString();
 				cBoxPortCymbals.removeAllItems();
 				cBoxPortCymbals.addItem(tempItem);
-				for (SerialPort port : comPort) {
+				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortCymbals.addItem(port.getSystemPortName());
 					}
@@ -615,15 +662,14 @@ public class SerialConfig extends JDialog {
 	
 	private void sendCOMTest(String portToTest, String channels) {
 		ArduinoCOM port = new ArduinoCOM(portToTest);
-		
 		port.openConnection();
 		
 		if (channels == "BOTH") {
-			port.serialWrite('C');
+			port.serialWrite('Z');
 		} else if (channels == "A" ) {
-			port.serialWrite('A');
-		}else if (channels == "B" ) {
-			port.serialWrite('B');
+			port.serialWrite('X',25);
+		} else if (channels == "B" ) {
+			port.serialWrite('Y');
 		}
 		
 		port.closeConnection();

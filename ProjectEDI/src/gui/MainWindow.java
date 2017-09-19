@@ -208,12 +208,25 @@ public class MainWindow {
 	
 	private static void mntmSerialComPort_Clicked(ActionEvent arg0) {
 		try {
-			SerialConfig dialog = new SerialConfig();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.pack();
-			dialog.setModal(true);
-			dialog.setVisible(true);
-			//instruments = dialog.
+			if (instruments.getSize() > 0) {
+				SerialConfig configWindow = new SerialConfig();
+				configWindow.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				configWindow.pack();
+				configWindow.setModal(true);
+				
+				// Write code here to import instruments
+				
+				configWindow.setVisible(true);
+				instruments = configWindow.instruments;
+			} else {
+				// No instruments in instrument list -> New Blank Config Window
+				SerialConfig configWindow = new SerialConfig();
+				configWindow.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				configWindow.pack();
+				configWindow.setModal(true);
+				configWindow.setVisible(true);
+				instruments = configWindow.instruments;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
