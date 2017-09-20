@@ -7,28 +7,26 @@ import java.util.Scanner;
 import com.fazecast.jSerialComm.SerialPort;
 
 public class ArduinoCOM {
-	//TODO: Create connection splash screen that waits for a "ready" byte value (R?) to come back from the Arduino.
 	private SerialPort comPort;
 	private String portDescription;
 	private int baud_rate;
 	
-	public ArduinoCOM() {
-		//empty constructor if port undecided
-	}
 	public ArduinoCOM(String portDescription) {
 		//57600 baud rate assumed if not provided
+		//Must have DTR enabled to prevent Ardunio from resetting when a connection is opened
 		this.portDescription = portDescription;
 		comPort = SerialPort.getCommPort(this.portDescription);
 		this.baud_rate = 57600;
 		comPort.setBaudRate(this.baud_rate);
+		comPort.setFlowControl(SerialPort.FLOW_CONTROL_DTR_ENABLED|SerialPort.FLOW_CONTROL_DSR_ENABLED);
 	}
 	
 	public ArduinoCOM(String portDescription, int baud_rate) {
-		//preferred constructor
 		this.portDescription = portDescription;
 		comPort = SerialPort.getCommPort(this.portDescription);
 		this.baud_rate = baud_rate;
 		comPort.setBaudRate(this.baud_rate);
+		comPort.setFlowControl(SerialPort.FLOW_CONTROL_DTR_ENABLED|SerialPort.FLOW_CONTROL_DSR_ENABLED);
 	}
 
 	public boolean openConnection(){

@@ -10,19 +10,25 @@ public class Instrument {
 	//							 position on staff?
 	private Integer	index;
 	private String instrumentName;
+	private Integer instrumentID;
 	private ArduinoCOM port;
 	private String channel;
 	private List<Integer> acceptedNotes = new ArrayList<Integer>();
 	
-	public Instrument(Integer index, String instrumentName, String portName, String channel, List<Integer> acceptedNotes) {
+	public Instrument(Integer index, String instrumentName, Integer instrumentID, String portName, String channel, List<Integer> acceptedNotes) {
 		this.index = index; //Location in Instruments collection
 		this.instrumentName = instrumentName; //Name of instrument
+		this.instrumentID = instrumentID;
 		this.port = new ArduinoCOM(portName); //Port instrument is located on
 		this.channel = channel; //Channel of instrument A, B, or BOTH
 		this.acceptedNotes = acceptedNotes; //List of midi notes this instrument will be triggered for
 	}
 	public void setName(String instrumentName) {
 		this.instrumentName = instrumentName;
+	}
+	
+	public void setInstrumentID(Integer instrumentID) {
+		this.instrumentID = instrumentID;
 	}
 	
 	public void setPort(String portName) {
@@ -43,6 +49,10 @@ public class Instrument {
 	
 	public String getName() {
 		return this.instrumentName;
+	}
+	
+	public Integer getInstrumentID() {
+		return this.instrumentID;
 	}
 	
 	public ArduinoCOM getPort() {

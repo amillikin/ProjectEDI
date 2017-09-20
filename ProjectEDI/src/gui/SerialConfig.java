@@ -81,8 +81,11 @@ public class SerialConfig extends JDialog {
 	private final List<Integer> rideNotes = new ArrayList<Integer>(Stream.of(49,57).collect(Collectors.toList()));
 	private final List<Integer> crashNotes = new ArrayList<Integer>(Stream.of(51,59).collect(Collectors.toList()));
 	
-	public SerialConfig() {
+	public SerialConfig(boolean isEmpty, Instruments savedInstruments) {
 		initialize();
+		if (!isEmpty) {
+			importSavedInstruments(savedInstruments);
+		}
 	}
 	
 	private void initialize() {
@@ -174,7 +177,7 @@ public class SerialConfig extends JDialog {
 		
 		cBoxPortSnare.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				//updateSerialPorts(1);
+				updateSerialPorts(1, cBoxPortSnare.getSelectedItem().toString());
 				if (cBoxPortSnare.getSelectedItem() != "") {
 					btnSendTestSnare.setEnabled(true);
 				} else {
@@ -184,7 +187,7 @@ public class SerialConfig extends JDialog {
 		});
 		cBoxPortCHiHat.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				updateSerialPorts(2);
+				updateSerialPorts(2,cBoxPortCHiHat.getSelectedItem().toString());
 				if (cBoxPortCHiHat.getSelectedItem() != "") {
 					btnSendTestCHiHat.setEnabled(true);
 				} else {
@@ -194,7 +197,7 @@ public class SerialConfig extends JDialog {
 		});
 		cBoxPortOHiHat.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				updateSerialPorts(3);
+				updateSerialPorts(3,cBoxPortOHiHat.getSelectedItem().toString());
 				if (cBoxPortOHiHat.getSelectedItem() != "") {
 					btnSendTestOHiHat.setEnabled(true);
 				} else {
@@ -204,7 +207,7 @@ public class SerialConfig extends JDialog {
 		});
 		cBoxPortBass.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				updateSerialPorts(4);
+				updateSerialPorts(4,cBoxPortBass.getSelectedItem().toString());
 				if (cBoxPortBass.getSelectedItem() != "") {
 					btnSendTestBass.setEnabled(true);
 				} else {
@@ -214,7 +217,7 @@ public class SerialConfig extends JDialog {
 		});
 		cBoxPortToms.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				updateSerialPorts(5);
+				updateSerialPorts(5,cBoxPortToms.getSelectedItem().toString());
 				if (cBoxPortToms.getSelectedItem() != "") {
 					btnSendTestToms.setEnabled(true);
 				} else {
@@ -224,7 +227,7 @@ public class SerialConfig extends JDialog {
 		});
 		cBoxPortCymbals.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				updateSerialPorts(6);
+				updateSerialPorts(6,cBoxPortCymbals.getSelectedItem().toString());
 				if (cBoxPortCymbals.getSelectedItem() != "") {
 					btnSendTestCymbals.setEnabled(true);
 				} else {
@@ -243,7 +246,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortSnare.addItem("");
 					cBoxPortSnare.setEnabled(false);
 				}
-				updateSerialPorts(1);
+				//updateSerialPorts(1);
 			}
 		});
 		chkEnSnareB.addItemListener(new ItemListener() {
@@ -255,7 +258,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortSnare.addItem("");
 					cBoxPortSnare.setEnabled(false);
 				}
-				updateSerialPorts(1);
+				//updateSerialPorts(1);
 			}
 		});
 		chkEnCHiHatA.addItemListener(new ItemListener() {
@@ -267,7 +270,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortCHiHat.addItem("");
 					cBoxPortCHiHat.setEnabled(false);
 				}
-				updateSerialPorts(2);
+				//updateSerialPorts(2);
 			}
 		});
 		chkEnCHiHatB.addItemListener(new ItemListener() {
@@ -279,7 +282,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortCHiHat.addItem("");
 					cBoxPortCHiHat.setEnabled(false);
 				}
-				updateSerialPorts(2);
+				//updateSerialPorts(2);
 			}
 		});
 		chkEnOHiHatA.addItemListener(new ItemListener() {
@@ -291,7 +294,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortOHiHat.addItem("");
 					cBoxPortOHiHat.setEnabled(false);
 				}
-				updateSerialPorts(3);
+				//updateSerialPorts(3);
 			}
 		});
 		chkEnOHiHatB.addItemListener(new ItemListener() {
@@ -303,7 +306,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortOHiHat.addItem("");
 					cBoxPortOHiHat.setEnabled(false);
 				}
-				updateSerialPorts(3);
+				//updateSerialPorts(3);
 			}
 		});
 		chkEnBassA.addItemListener(new ItemListener() {
@@ -315,7 +318,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortBass.addItem("");
 					cBoxPortBass.setEnabled(false);
 				}
-				updateSerialPorts(4);
+				//updateSerialPorts(4);
 			}
 		});
 		chkEnBassB.addItemListener(new ItemListener() {
@@ -327,7 +330,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortBass.addItem("");
 					cBoxPortBass.setEnabled(false);
 				}
-				updateSerialPorts(4);
+				//updateSerialPorts(4);
 			}
 		});
 		chkEnTomsA.addItemListener(new ItemListener() {
@@ -339,7 +342,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortToms.addItem("");
 					cBoxPortToms.setEnabled(false);
 				}
-				updateSerialPorts(5);
+				//updateSerialPorts(5);
 			}
 		});
 		chkEnTomsB.addItemListener(new ItemListener() {
@@ -351,7 +354,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortToms.addItem("");
 					cBoxPortToms.setEnabled(false);
 				}
-				updateSerialPorts(5);
+				//updateSerialPorts(5);
 			}
 		});
 		chkEnCymbalsA.addItemListener(new ItemListener() {
@@ -363,7 +366,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortCymbals.addItem("");
 					cBoxPortCymbals.setEnabled(false);
 				}
-				updateSerialPorts(6);
+				//updateSerialPorts(6);
 			}
 		});
 		chkEnCymbalsB.addItemListener(new ItemListener() {
@@ -375,7 +378,7 @@ public class SerialConfig extends JDialog {
 					cBoxPortCymbals.addItem("");
 					cBoxPortCymbals.setEnabled(false);
 				}
-				updateSerialPorts(6);
+				//updateSerialPorts(6);
 			}
 		});
 		
@@ -451,93 +454,96 @@ public class SerialConfig extends JDialog {
 			public void actionPerformed(ActionEvent arg0) {
 				Integer i = 0;
 				
+				//Clear Instruments list to create new list
+				instruments.clearList();
+				
 				if (chkEnSnareA.isSelected() && chkEnSnareB.isSelected()) {
-					Instrument snare = new Instrument(i, "Snare", cBoxPortSnare.getSelectedItem().toString(), "BOTH", snareNotes);
+					Instrument snare = new Instrument(i, "Snare", 1, cBoxPortSnare.getSelectedItem().toString(), "BOTH", snareNotes);
 					instruments.addInstrument(snare);
 					i++;
 				} else if (chkEnSnareA.isSelected()) {
-					Instrument snare = new Instrument(i, "Snare", cBoxPortSnare.getSelectedItem().toString(), "A", snareNotes);
+					Instrument snare = new Instrument(i, "Snare", 1, cBoxPortSnare.getSelectedItem().toString(), "A", snareNotes);
 					instruments.addInstrument(snare);
 					i++;
 				} else if (chkEnSnareB.isSelected()) {
-					Instrument snare = new Instrument(i, "Snare", cBoxPortSnare.getSelectedItem().toString(), "B", snareNotes);
+					Instrument snare = new Instrument(i, "Snare", 1, cBoxPortSnare.getSelectedItem().toString(), "B", snareNotes);
 					instruments.addInstrument(snare);
 					i++;
 				}
 				
 				if (chkEnCHiHatA.isSelected() && chkEnCHiHatB.isSelected()) {
-					Instrument cHiHat = new Instrument(i, "Closed Hi-Hat", cBoxPortCHiHat.getSelectedItem().toString(), "BOTH", cHiHatNotes);
+					Instrument cHiHat = new Instrument(i, "Closed Hi-Hat", 2, cBoxPortCHiHat.getSelectedItem().toString(), "BOTH", cHiHatNotes);
 					instruments.addInstrument(cHiHat);
 					i++;
 				} else if (chkEnCHiHatA.isSelected()) {
-					Instrument cHiHat = new Instrument(i, "Closed Hi-Hat", cBoxPortCHiHat.getSelectedItem().toString(), "A", cHiHatNotes);
+					Instrument cHiHat = new Instrument(i, "Closed Hi-Hat", 2, cBoxPortCHiHat.getSelectedItem().toString(), "A", cHiHatNotes);
 					instruments.addInstrument(cHiHat);
 					i++;
 				} else if (chkEnCHiHatB.isSelected()) {
-					Instrument cHiHat = new Instrument(i, "Closed Hi-Hat", cBoxPortCHiHat.getSelectedItem().toString(), "B", cHiHatNotes);
+					Instrument cHiHat = new Instrument(i, "Closed Hi-Hat", 2, cBoxPortCHiHat.getSelectedItem().toString(), "B", cHiHatNotes);
 					instruments.addInstrument(cHiHat);
 					i++;
 				}
 
 
 				if (chkEnOHiHatA.isSelected() && chkEnOHiHatB.isSelected()) {
-					Instrument oHiHat = new Instrument(i, "Open Hi-Hat", cBoxPortOHiHat.getSelectedItem().toString(), "BOTH", oHiHatNotes);
+					Instrument oHiHat = new Instrument(i, "Open Hi-Hat", 3, cBoxPortOHiHat.getSelectedItem().toString(), "BOTH", oHiHatNotes);
 					instruments.addInstrument(oHiHat);
 					i++;
 				} else if (chkEnOHiHatA.isSelected()) {
-					Instrument oHiHat = new Instrument(i, "Open Hi-Hat", cBoxPortOHiHat.getSelectedItem().toString(), "A", oHiHatNotes);
+					Instrument oHiHat = new Instrument(i, "Open Hi-Hat", 3, cBoxPortOHiHat.getSelectedItem().toString(), "A", oHiHatNotes);
 					instruments.addInstrument(oHiHat);
 					i++;
 				} else if (chkEnOHiHatB.isSelected()) {
-					Instrument oHiHat = new Instrument(i, "Open Hi-Hat", cBoxPortOHiHat.getSelectedItem().toString(), "B", oHiHatNotes);
+					Instrument oHiHat = new Instrument(i, "Open Hi-Hat", 3, cBoxPortOHiHat.getSelectedItem().toString(), "B", oHiHatNotes);
 					instruments.addInstrument(oHiHat);
 					i++;
 				}
 				
 				if (chkEnBassA.isSelected() && chkEnBassB.isSelected()) {
-					Instrument bass = new Instrument(i, "Bass", cBoxPortBass.getSelectedItem().toString(), "BOTH", bassNotes);
+					Instrument bass = new Instrument(i, "Bass", 4, cBoxPortBass.getSelectedItem().toString(), "BOTH", bassNotes);
 					instruments.addInstrument(bass);
 					i++;
 				} else if (chkEnBassA.isSelected()) {
-					Instrument bass = new Instrument(i, "Bass", cBoxPortBass.getSelectedItem().toString(), "A", bassNotes);
+					Instrument bass = new Instrument(i, "Bass", 4, cBoxPortBass.getSelectedItem().toString(), "A", bassNotes);
 					instruments.addInstrument(bass);
 					i++;
 				} else if (chkEnBassB.isSelected()) {
-					Instrument bass = new Instrument(i, "Bass", cBoxPortBass.getSelectedItem().toString(), "B", bassNotes);
+					Instrument bass = new Instrument(i, "Bass", 4, cBoxPortBass.getSelectedItem().toString(), "B", bassNotes);
 					instruments.addInstrument(bass);
 					i++;
 				}
 				
 				if (chkEnTomsA.isSelected() && chkEnTomsB.isSelected()) {
-					Instrument lowToms = new Instrument(i, "Low Tom", cBoxPortToms.getSelectedItem().toString(), "A", lowTomNotes);
+					Instrument lowToms = new Instrument(i, "Low Tom", 5, cBoxPortToms.getSelectedItem().toString(), "A", lowTomNotes);
 					instruments.addInstrument(lowToms);
 					i++;
-					Instrument highToms = new Instrument(i, "High Tom", cBoxPortToms.getSelectedItem().toString(), "B", highTomNotes);
+					Instrument highToms = new Instrument(i, "High Tom", 6, cBoxPortToms.getSelectedItem().toString(), "B", highTomNotes);
 					instruments.addInstrument(highToms);
 					i++;
 				} else if (chkEnTomsA.isSelected()) {
-					Instrument lowToms = new Instrument(i, "Low Tom", cBoxPortToms.getSelectedItem().toString(), "A", lowTomNotes);
+					Instrument lowToms = new Instrument(i, "Low Tom", 5, cBoxPortToms.getSelectedItem().toString(), "A", lowTomNotes);
 					instruments.addInstrument(lowToms);
 					i++;
 				} else if (chkEnTomsB.isSelected()) {
-					Instrument highToms = new Instrument(i, "High Tom", cBoxPortToms.getSelectedItem().toString(), "B", highTomNotes);
+					Instrument highToms = new Instrument(i, "High Tom", 6, cBoxPortToms.getSelectedItem().toString(), "B", highTomNotes);
 					instruments.addInstrument(highToms);
 					i++;
 				}
 				
 				if (chkEnCymbalsA.isSelected() && chkEnCymbalsB.isSelected()) {
-					Instrument ride = new Instrument(i, "Ride Cymbal", cBoxPortCymbals.getSelectedItem().toString(), "A", rideNotes);
+					Instrument ride = new Instrument(i, "Ride Cymbal", 7, cBoxPortCymbals.getSelectedItem().toString(), "A", rideNotes);
 					instruments.addInstrument(ride);
 					i++;
-					Instrument crash = new Instrument(i, "Crash Cymbal", cBoxPortCymbals.getSelectedItem().toString(), "B", crashNotes);
+					Instrument crash = new Instrument(i, "Crash Cymbal", 8, cBoxPortCymbals.getSelectedItem().toString(), "B", crashNotes);
 					instruments.addInstrument(crash);
 					i++;
 				} else if (chkEnCymbalsA.isSelected()) {
-					Instrument ride = new Instrument(i, "Ride Cymbal", cBoxPortCymbals.getSelectedItem().toString(), "A", rideNotes);
+					Instrument ride = new Instrument(i, "Ride Cymbal", 7, cBoxPortCymbals.getSelectedItem().toString(), "A", rideNotes);
 					instruments.addInstrument(ride);
 					i++;
 				} else if (chkEnCymbalsB.isSelected()) {
-					Instrument crash = new Instrument(i, "Crash Cymbal", cBoxPortCymbals.getSelectedItem().toString(), "B", crashNotes);
+					Instrument crash = new Instrument(i, "Crash Cymbal", 8, cBoxPortCymbals.getSelectedItem().toString(), "B", crashNotes);
 					instruments.addInstrument(crash);
 					i++;
 				}
@@ -550,12 +556,13 @@ public class SerialConfig extends JDialog {
 				dispose();
 			}
 		});
+
 		
 		this.pack();
 
 	}
 	
-	private void updateSerialPorts(Integer cBoxSelected) {
+	private void updateSerialPorts(Integer cBoxSelected, String selectedItem) {
 		/* Cases:
 		 * 1:Snare
 		 * 2:Closed Hi-Hat
@@ -573,9 +580,8 @@ public class SerialConfig extends JDialog {
 		
 		switch (cBoxSelected) {
 			case 1:
-				tempItem = cBoxPortSnare.getSelectedItem().toString();
 				cBoxPortSnare.removeAllItems();
-				cBoxPortSnare.addItem(tempItem);
+				cBoxPortSnare.addItem(selectedItem);
 				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortSnare.addItem(port.getSystemPortName());
@@ -584,9 +590,8 @@ public class SerialConfig extends JDialog {
 				break;
 				
 			case 2:
-				tempItem = cBoxPortCHiHat.getSelectedItem().toString();
 				cBoxPortCHiHat.removeAllItems();
-				cBoxPortCHiHat.addItem(tempItem);
+				cBoxPortCHiHat.addItem(selectedItem);
 				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortCHiHat.addItem(port.getSystemPortName());
@@ -595,9 +600,8 @@ public class SerialConfig extends JDialog {
 				break;
 				
 			case 3:
-				tempItem = cBoxPortOHiHat.getSelectedItem().toString();
 				cBoxPortOHiHat.removeAllItems();
-				cBoxPortOHiHat.addItem(tempItem);
+				cBoxPortOHiHat.addItem(selectedItem);
 				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortOHiHat.addItem(port.getSystemPortName());
@@ -606,9 +610,8 @@ public class SerialConfig extends JDialog {
 				break;
 				
 			case 4:
-				tempItem = cBoxPortBass.getSelectedItem().toString();
 				cBoxPortBass.removeAllItems();
-				cBoxPortBass.addItem(tempItem);
+				cBoxPortBass.addItem(selectedItem);
 				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortBass.addItem(port.getSystemPortName());
@@ -617,9 +620,8 @@ public class SerialConfig extends JDialog {
 				break;
 				
 			case 5:
-				tempItem = cBoxPortToms.getSelectedItem().toString();
 				cBoxPortToms.removeAllItems();
-				cBoxPortToms.addItem(tempItem);
+				cBoxPortToms.addItem(selectedItem);
 				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortToms.addItem(port.getSystemPortName());
@@ -628,9 +630,8 @@ public class SerialConfig extends JDialog {
 				break;
 				
 			case 6:
-				tempItem = cBoxPortCymbals.getSelectedItem().toString();
 				cBoxPortCymbals.removeAllItems();
-				cBoxPortCymbals.addItem(tempItem);
+				cBoxPortCymbals.addItem(selectedItem);
 				for (SerialPort port : SerialPort.getCommPorts()) {
 					if (!isPortSelected(port)) {
 						cBoxPortCymbals.addItem(port.getSystemPortName());
@@ -667,12 +668,65 @@ public class SerialConfig extends JDialog {
 		if (channels == "BOTH") {
 			port.serialWrite('Z');
 		} else if (channels == "A" ) {
-			port.serialWrite('X',25);
+			port.serialWrite('X');
 		} else if (channels == "B" ) {
 			port.serialWrite('Y');
 		}
 		
 		port.closeConnection();
 	}
-}
 
+	private void importSavedInstruments(Instruments savedInstruments) {
+		for (Instrument instrument : savedInstruments) {
+			switch (instrument.getInstrumentID()) {
+			case 1: setSnare(instrument);
+				break;
+			case 2: setCHiHat(instrument);
+				break;
+			case 3: setOHiHat(instrument);
+				break;
+			case 4: setBass(instrument);
+				break;
+			case 5: setLowTom(instrument);
+				break;
+			case 6: setHighTom(instrument);
+				break;
+			case 7: setRide(instrument);
+				break;
+			case 8: setCrash(instrument);
+				break;
+			}
+		}
+	}
+	private void setSnare(Instrument instrument) {
+		
+		if (instrument.getChannel() == "BOTH") {
+			
+		} else if (instrument.getChannel() == "A") {
+			
+		} else if (instrument.getChannel() == "B") {
+			
+		}
+	}
+	private void setCHiHat(Instrument instrument) {
+		
+	}
+	private void setOHiHat(Instrument instrument) {
+		
+	}
+	private void setBass(Instrument instrument) {
+		
+	}
+	private void setLowTom(Instrument instrument) {
+		
+	}
+	private void setHighTom(Instrument instrument) {
+		
+	}
+	private void setRide(Instrument instrument) {
+		
+	}
+	private void setCrash(Instrument instrument) {
+		
+	}
+}

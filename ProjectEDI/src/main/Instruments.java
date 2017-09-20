@@ -3,7 +3,7 @@ package main;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Instruments {
+public class Instruments extends ArrayList<Instrument>{
 	// TODO Instrument collection... holds an array of instrument objects
 	private List<Instrument> instruments = new ArrayList<Instrument>();
 	
