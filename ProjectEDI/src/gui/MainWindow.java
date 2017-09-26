@@ -40,7 +40,6 @@ import jm.music.data.Note;
 import jm.music.data.Part;
 import jm.music.data.Phrase;
 import jm.music.data.Score;
-import main.Instruments;
 
 import javax.swing.JScrollPane;
 
@@ -60,7 +59,6 @@ public class MainWindow {
 	private final JMenu mnHelp = new JMenu("Help");
 	private final JMenuItem mntmAbout = new JMenuItem("About");
 	private final JScrollPane scrollPane = new JScrollPane();
-	private static Instruments instruments = new Instruments();
 	
 	public MainWindow() {
 		initialize();

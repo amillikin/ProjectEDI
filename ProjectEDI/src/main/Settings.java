@@ -21,7 +21,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Settings {
-	public static void saveSettings(Instruments instruments) {
+	public static void saveSettings(List<Instrument> instruments) {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		try {
 			//Make Settings Document
@@ -44,8 +44,8 @@ public class Settings {
 
 	}
 	
-	public Instruments loadSettings() {
-		Instruments instruments = new Instruments();
+	public List<Instrument> loadSettings() {
+		List<Instrument> instruments = new ArrayList<Instrument>();
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		try {
 			//Read Settings Document
@@ -65,15 +65,15 @@ public class Settings {
 		return instruments;
 	}
 	
-	private static Document makeDocument(Document doc, Instruments instruments) {
+	private static Document makeDocument(Document doc, List<Instrument> instruments) {
 		Element instrumentsRoot = doc.createElement("INSTRUMENTS");
 		doc.appendChild(instrumentsRoot);
 		for (Instrument instrument : instruments) {
 			Element newInstrument = doc.createElement("INSTRUMENT");
-			doc.appendChild(newInstrument);
 			
 			//Sets instrument id attribute to Current instrument index
 			newInstrument.setAttribute("id", instrument.getInstrumentID().toString());
+			instrumentsRoot.appendChild(newInstrument);
 			
 			//Instrument Name
 			Element instrumentName = doc.createElement("NAME");
@@ -90,7 +90,7 @@ public class Settings {
 			channel.appendChild(doc.createTextNode(instrument.getChannel()));
 			newInstrument.appendChild(channel);
 			
-			//Accepted Notes
+			//Accepted Notes - DOESN'T SEPARATE NOTES - FIX
 			Element notes = doc.createElement("NOTES");
 			for (Integer note : instrument.getAcceptedNotes()) {
 				notes.appendChild(doc.createTextNode(note.toString()));
@@ -100,8 +100,8 @@ public class Settings {
 		return doc;
 	}
 	
-	private Instruments parseDoc(Document doc) {
-		Instruments instruments = new Instruments();
+	private List<Instrument> parseDoc(Document doc) {
+		List<Instrument> instruments = new ArrayList<Instrument>();
 		doc.getDocumentElement().normalize();
 		NodeList nList = doc.getElementsByTagName("INSTRUMENTS");
 		
@@ -127,7 +127,7 @@ public class Settings {
 				//Channel
 				channel = instrumentElement.getElementsByTagName("CHANNEL").item(0).getTextContent();
 				
-				//Accepted Notes
+				//Accepted Notes - SEE makeDocument: DOESN'T MAKE A LIST
 				for (int j = 0; j < instrumentElement.getElementsByTagName("NOTES").getLength(); j++) {
 					acceptedNotes.add(Integer.parseInt(instrumentElement.getElementsByTagName("NOTES").item(j).getTextContent()));
 				}
