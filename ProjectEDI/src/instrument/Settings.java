@@ -1,4 +1,4 @@
-package main;
+package instrument;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class Settings {
 
 	}
 	
-	public List<Instrument> loadSettings() {
+	public static List<Instrument> loadSettings() {
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		try {
@@ -89,18 +89,11 @@ public class Settings {
 			Element channel = doc.createElement("CHANNEL");
 			channel.appendChild(doc.createTextNode(instrument.getChannel()));
 			newInstrument.appendChild(channel);
-			
-			//Accepted Notes - DOESN'T SEPARATE NOTES - FIX
-			Element notes = doc.createElement("NOTES");
-			for (Integer note : instrument.getAcceptedNotes()) {
-				notes.appendChild(doc.createTextNode(note.toString()));
-			}
-			newInstrument.appendChild(notes);
 		}
 		return doc;
 	}
 	
-	private List<Instrument> parseDoc(Document doc) {
+	private static List<Instrument> parseDoc(Document doc) {
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		doc.getDocumentElement().normalize();
 		NodeList nList = doc.getElementsByTagName("INSTRUMENTS");
@@ -113,7 +106,6 @@ public class Settings {
 				String instrumentName;
 				String portName;
 				String channel;
-				List<Integer> acceptedNotes = new ArrayList<Integer>();
 				
 				//Index
 				id = Integer.parseInt(instrumentElement.getAttribute("id"));
@@ -127,12 +119,7 @@ public class Settings {
 				//Channel
 				channel = instrumentElement.getElementsByTagName("CHANNEL").item(0).getTextContent();
 				
-				//Accepted Notes - SEE makeDocument: DOESN'T MAKE A LIST
-				for (int j = 0; j < instrumentElement.getElementsByTagName("NOTES").getLength(); j++) {
-					acceptedNotes.add(Integer.parseInt(instrumentElement.getElementsByTagName("NOTES").item(j).getTextContent()));
-				}
-				
-				Instrument instrument = new Instrument(i, instrumentName, id, portName, channel, acceptedNotes);
+				Instrument instrument = new Instrument(i, instrumentName, id, portName, channel);
 				instruments.add(instrument);
 			}
 		}

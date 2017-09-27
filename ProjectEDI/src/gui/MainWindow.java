@@ -116,7 +116,7 @@ public class MainWindow {
 				mntmSerialComPort_Clicked(arg0);
 			}
 		});
-		
+				
 	}
 	
 	private static void mntmNew_Clicked(ActionEvent arg0) {

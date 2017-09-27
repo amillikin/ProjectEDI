@@ -1,4 +1,4 @@
-package main;
+package instrument;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +15,13 @@ public class Instrument {
 	private String channel;
 	private List<Integer> acceptedNotes = new ArrayList<Integer>();
 	
-	public Instrument(Integer index, String instrumentName, Integer instrumentID, String portName, String channel, List<Integer> acceptedNotes) {
+	public Instrument(Integer index, String instrumentName, Integer instrumentID, String portName, String channel) {
 		this.index = index; //Location in Instruments collection
 		this.instrumentName = instrumentName; //Name of instrument
 		this.instrumentID = instrumentID;
 		this.port = new ArduinoCOM(portName); //Port instrument is located on
 		this.channel = channel; //Channel of instrument A, B, or BOTH
-		this.acceptedNotes = acceptedNotes; //List of midi notes this instrument will be triggered for
+		this.acceptedNotes = lookUpNotes(this.instrumentID); //List of midi notes this instrument will be triggered for
 	}
 	public void setName(String instrumentName) {
 		this.instrumentName = instrumentName;
@@ -37,10 +37,6 @@ public class Instrument {
 	
 	public void setChannel(String channel) {
 		this.channel = channel;
-	}
-	
-	public void setAcceptedNotes(List<Integer> acceptedNotes) {
-		this.acceptedNotes = acceptedNotes;
 	}
 	
 	public Integer getIndex() {
@@ -64,5 +60,28 @@ public class Instrument {
 	}
 	public List<Integer> getAcceptedNotes(){
 		return this.acceptedNotes;
+	}
+	
+	private List<Integer> lookUpNotes(Integer instrumentID){
+		List <Integer> noteList = new ArrayList<Integer>();
+		switch (instrumentID) {
+		case 1: 
+			noteList = Constants.snareNotes;
+		case 2: 
+			noteList = Constants.cHiHatNotes;
+		case 3: 
+			noteList = Constants.oHiHatNotes;
+		case 4: 
+			noteList = Constants.bassNotes;
+		case 5: 
+			noteList = Constants.lowTomNotes;
+		case 6: 
+			noteList = Constants.highTomNotes;
+		case 7: 
+			noteList = Constants.rideNotes;
+		case 8: 
+			noteList = Constants.crashNotes;
+		}
+		return noteList;
 	}
 }
