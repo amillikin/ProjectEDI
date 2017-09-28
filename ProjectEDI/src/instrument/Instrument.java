@@ -67,20 +67,28 @@ public class Instrument {
 		switch (instrumentID) {
 		case 1: 
 			noteList = Constants.snareNotes;
+			break;
 		case 2: 
 			noteList = Constants.cHiHatNotes;
+			break;
 		case 3: 
 			noteList = Constants.oHiHatNotes;
+			break;
 		case 4: 
 			noteList = Constants.bassNotes;
+			break;
 		case 5: 
 			noteList = Constants.lowTomNotes;
+			break;
 		case 6: 
 			noteList = Constants.highTomNotes;
+			break;
 		case 7: 
 			noteList = Constants.rideNotes;
+			break;
 		case 8: 
 			noteList = Constants.crashNotes;
+			break;
 		}
 		return noteList;
 	}

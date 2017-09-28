@@ -57,10 +57,10 @@ public class Settings {
 			
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		} catch (SAXException se) {
-			se.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
 		}
 		return instruments;
 	}
@@ -70,9 +70,10 @@ public class Settings {
 		doc.appendChild(instrumentsRoot);
 		for (Instrument instrument : instruments) {
 			Element newInstrument = doc.createElement("INSTRUMENT");
+			String id = instrument.getInstrumentID().toString();
 			
 			//Sets instrument id attribute to Current instrument index
-			newInstrument.setAttribute("id", instrument.getInstrumentID().toString());
+			newInstrument.setAttribute("id", id);
 			instrumentsRoot.appendChild(newInstrument);
 			
 			//Instrument Name
@@ -96,7 +97,7 @@ public class Settings {
 	private static List<Instrument> parseDoc(Document doc) {
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		doc.getDocumentElement().normalize();
-		NodeList nList = doc.getElementsByTagName("INSTRUMENTS");
+		NodeList nList = doc.getElementsByTagName("INSTRUMENT");
 		
 		for (int i = 0; i < nList.getLength(); i++) {
 			Node node = nList.item(i);

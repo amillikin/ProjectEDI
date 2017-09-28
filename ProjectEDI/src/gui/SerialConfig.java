@@ -715,106 +715,110 @@ public class SerialConfig extends JDialog {
 
 	private void importSavedInstruments() {
 		List<Instrument> savedInstruments = new ArrayList<Instrument>();
+		String channel;
+		String port;
 		savedInstruments = Settings.loadSettings();
 		if (savedInstruments.isEmpty()) return; //No saved settings or empty settings file
 		for (Instrument instrument : savedInstruments) {
+			channel = instrument.getChannel();
+			port = instrument.getPort().getPortDescription();
 			switch (instrument.getInstrumentID()) {
-			case 1: setSnare(instrument);
-				break;
-			case 2: setCHiHat(instrument);
-				break;
-			case 3: setOHiHat(instrument);
-				break;
-			case 4: setBass(instrument);
-				break;
-			case 5: setLowTom(instrument);
-				break;
-			case 6: setHighTom(instrument);
-				break;
-			case 7: setRide(instrument);
-				break;
-			case 8: setCrash(instrument);
-				break;
+				case 1: setSnare(channel, port);
+					break;
+				case 2: setCHiHat(channel, port);
+					break;
+				case 3: setOHiHat(channel, port);
+					break;
+				case 4: setBass(channel, port);
+					break;
+				case 5: setLowTom(channel, port);
+					break;
+				case 6: setHighTom(channel, port);
+					break;
+				case 7: setRide(channel, port);
+					break;
+				case 8: setCrash(channel, port);
+					break;
 			}
 		}
 	}
-	private void setSnare(Instrument instrument) {
-		if (instrument.getChannel() == "BOTH") {
+	private void setSnare(String channel, String port) {
+		if (channel.equals("BOTH")) {
 			chkEnSnareA.setSelected(true);
 			chkEnSnareB.setSelected(true);
-		} else if (instrument.getChannel() == "A") {
+		} else if (channel.equals("A")) {
 			chkEnSnareA.setSelected(true);
-		} else if (instrument.getChannel() == "B") {
+		} else if (channel.equals("B")) {
 			chkEnSnareB.setSelected(true);
 		} else {
 			return;
 		}
-		updateSerialPorts(Constants.SNARE,instrument.getPort().getPortDescription());
+		updateSerialPorts(Constants.SNARE,port);
 	}
-	private void setCHiHat(Instrument instrument) {
-		if (instrument.getChannel() == "BOTH") {
+	private void setCHiHat(String channel, String port) {
+		if (channel.equals("BOTH")) {
 			chkEnCHiHatA.setSelected(true);
 			chkEnCHiHatB.setSelected(true);
-		} else if (instrument.getChannel() == "A") {
+		} else if (channel.equals("A")) {
 			chkEnCHiHatA.setSelected(true);
-		} else if (instrument.getChannel() == "B") {
+		} else if (channel.equals("B")) {
 			chkEnCHiHatB.setSelected(true);
 		} else {
 			return;
 		}
-		updateSerialPorts(Constants.CLOSED_HI_HAT,instrument.getPort().getPortDescription());
+		updateSerialPorts(Constants.CLOSED_HI_HAT,port);
 	}
-	private void setOHiHat(Instrument instrument) {
-		if (instrument.getChannel() == "BOTH") {
+	private void setOHiHat(String channel, String port) {
+		if (channel.equals("BOTH")) {
 			chkEnOHiHatA.setSelected(true);
 			chkEnOHiHatB.setSelected(true);
-		} else if (instrument.getChannel() == "A") {
+		} else if (channel.equals("A")) {
 			chkEnOHiHatA.setSelected(true);
-		} else if (instrument.getChannel() == "B") {
+		} else if (channel.equals("B")) {
 			chkEnOHiHatB.setSelected(true);
 		} else {
 			return;
 		}
-		updateSerialPorts(Constants.OPEN_HI_HAT,instrument.getPort().getPortDescription());
+		updateSerialPorts(Constants.OPEN_HI_HAT,port);
 	}
-	private void setBass(Instrument instrument) {
-		if (instrument.getChannel() == "A") {
+	private void setBass(String channel, String port) {
+		if (channel.equals("A")) {
 			chkEnBassA.setSelected(true);
 		} else {
 			return;
 		}
-		updateSerialPorts(Constants.BASS,instrument.getPort().getPortDescription());
+		updateSerialPorts(Constants.BASS,port);
 	}
-	private void setLowTom(Instrument instrument) {
-		if (instrument.getChannel() == "A") {
+	private void setLowTom(String channel, String port) {
+		if (channel.equals("A")) {
 			chkEnTomsA.setSelected(true);
 		} else {
 			return;
 		}
-		updateSerialPorts(Constants.TOMS,instrument.getPort().getPortDescription());
+		updateSerialPorts(Constants.TOMS,port);
 	}
-	private void setHighTom(Instrument instrument) {
-		if (instrument.getChannel() == "B") {
+	private void setHighTom(String channel, String port) {
+		if (channel.equals("B")) {
 			chkEnTomsB.setSelected(true);
 		} else {
 			return;
 		}
-		updateSerialPorts(Constants.TOMS,instrument.getPort().getPortDescription());
+		updateSerialPorts(Constants.TOMS,port);
 	}
-	private void setRide(Instrument instrument) {
-		if (instrument.getChannel() == "A") {
+	private void setRide(String channel, String port) {
+		if (channel.equals("A")) {
 			chkEnCymbalsA.setSelected(true);
 		} else {
 			return;
 		}
-		updateSerialPorts(Constants.CYMBALS,instrument.getPort().getPortDescription());
+		updateSerialPorts(Constants.CYMBALS,port);
 	}
-	private void setCrash(Instrument instrument) {
-		if (instrument.getChannel() == "B") {
+	private void setCrash(String channel, String port) {
+		if (channel.equals("B")) {
 			chkEnCymbalsB.setSelected(true);
 		} else {
 			return;
 		}
-		updateSerialPorts(Constants.CYMBALS,instrument.getPort().getPortDescription());
+		updateSerialPorts(Constants.CYMBALS,port);
 	}
 }
