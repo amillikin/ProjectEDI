@@ -8,6 +8,8 @@ import javax.swing.JToolBar;
 import javax.swing.filechooser.FileSystemView;
 
 import org.jfugue.midi.MidiFileManager;
+import org.jfugue.midi.MidiParser;
+import org.jfugue.midi.MidiParserListener;
 import org.jfugue.parser.Parser;
 import org.jfugue.parser.ParserListenerAdapter;
 import org.jfugue.pattern.Pattern;
@@ -26,9 +28,13 @@ import javax.swing.JMenuItem;
 import java.awt.Frame;
 import java.awt.ScrollPane;
 
+import javax.sound.midi.MidiSystem;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import com.fazecast.jSerialComm.*;
+
+import arduino.ArduinoPattern;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -123,7 +129,7 @@ public class MainWindow {
 	
 	private static void mntmNew_Clicked(ActionEvent arg0) {
 		try {
-			Score score = new Score("New Score");
+			/*Score score = new Score("New Score");
 			Part part1 = new Part("Drum Kit",0,9);
 			Phrase phrase1 = new Phrase(0.0);
 			Note note1 = new Note(jm.constants.DrumMap.ACOUSTIC_SNARE,jm.constants.Durations.EN);
@@ -131,7 +137,7 @@ public class MainWindow {
 			Note note3 = new Note(jm.constants.DrumMap.ACOUSTIC_SNARE,jm.constants.Durations.EN);
 			Note note4 = new Note(jm.constants.DrumMap.ACOUSTIC_SNARE,jm.constants.Durations.EN);
 			phrase1.add(note1);
-			phrase1.add(note2);
+			phrase1.add(note2); 
 			phrase1.add(note3);
 			phrase1.add(note4);
 			part1.addPhrase(phrase1);
@@ -172,14 +178,11 @@ public class MainWindow {
 			int retVal = fc.showOpenDialog(null);
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				MusicXmlParser mXmlParser = new MusicXmlParser();
-				MusicXmlParserListener mXmlListener = new MusicXmlParserListener();
-				mXmlParser.addParserListener(mXmlListener);
-				mXmlParser.parse(file);
-				Pattern pattern = new Pattern(mXmlListener.getMusicXMLString());
+				Pattern pattern = new Pattern(MidiFileManager.loadPatternFromMidi(file));
+				ArduinoPattern arduinoPattern = new ArduinoPattern(pattern);
 				//Player player = new Player();
 				//player.play(pattern);
-				System.out.println(pattern);
+				//System.out.println(pattern);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

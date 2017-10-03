@@ -870,6 +870,7 @@ public class NoteSubparser implements Subparser, NoteProvider, ChordProvider {
     @Override
     public Note createNote(String noteString) {
     	StaccatoParserContext parserContext = new StaccatoParserContext(new StaccatoParser());
+    	populateContext(parserContext);
     	NoteContext noteContext = new NoteContext();
     	parseNoteElement(noteString, 0, noteContext, parserContext);
     	return noteContext.createNote(parserContext);
@@ -884,6 +885,7 @@ public class NoteSubparser implements Subparser, NoteProvider, ChordProvider {
     public double getDurationForString(String s) {
     	NoteContext noteContext = new NoteContext();
     	StaccatoParserContext parserContext = new StaccatoParserContext(new StaccatoParser());
+    	populateContext(parserContext);
     	this.parseDuration(s, 0, noteContext, parserContext);
     	return noteContext.decimalDuration;
     }
@@ -912,6 +914,7 @@ public class NoteSubparser implements Subparser, NoteProvider, ChordProvider {
     	}
     	
     	StaccatoParserContext parserContext = new StaccatoParserContext(new StaccatoParser());
+    	populateContext(parserContext);
     	NoteContext noteContext = new NoteContext();
     	parseNoteElement(chordString, 0, noteContext, parserContext);
     	return noteContext.createChord(parserContext);
