@@ -9,9 +9,11 @@ import javax.swing.filechooser.FileSystemView;
 
 import org.jfugue.midi.MidiFileManager;
 import org.jfugue.parser.Parser;
+import org.jfugue.parser.ParserListenerAdapter;
 import org.jfugue.pattern.Pattern;
 import org.jfugue.player.Player;
 import org.jfugue.integration.MusicXmlParser;
+import org.jfugue.integration.MusicXmlParserListener;
 
 import java.awt.BorderLayout;
 import javax.swing.JButton;
@@ -170,8 +172,11 @@ public class MainWindow {
 			int retVal = fc.showOpenDialog(null);
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				Pattern pattern = new Pattern();
-				//pattern = MusicXmlParser.parse(file);
+				MusicXmlParser mXmlParser = new MusicXmlParser();
+				MusicXmlParserListener mXmlListener = new MusicXmlParserListener();
+				mXmlParser.addParserListener(mXmlListener);
+				mXmlParser.parse(file);
+				Pattern pattern = new Pattern(mXmlListener.getMusicXMLString());
 				//Player player = new Player();
 				//player.play(pattern);
 				System.out.println(pattern);

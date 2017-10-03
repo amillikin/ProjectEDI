@@ -27,9 +27,7 @@ import java.util.stream.Stream;
 import java.awt.event.ItemEvent;
 
 public class SerialConfig extends JDialog {
-	/*TODO: Need to add some sort of global handling for ports being disconnected/reconnected...
-	 *		Need to be able to preserve settings window after exiting...
-	 *		Add handling to parent that sets window with relevant information 
+	/*TODO: FIX Port comboboxes to remove selected items
 	*/
 	
 	private final JLabel lblInstrument = new JLabel("Instrument");
