@@ -1,19 +1,18 @@
 package instrument;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+
 import arduino.ArduinoCOM;
 
 public class Instrument {
 	// TODO Instrument object class
-	//		Possible attributes: instrument name, A/B channel, Serial Port,
-	//							 position on staff?
+	//		Possible attributes: position on staff?
 	private Integer	index;
 	private String instrumentName;
 	private Integer instrumentID;
 	private ArduinoCOM port;
 	private String channel;
-	private List<Integer> acceptedNotes = new ArrayList<Integer>();
+	private HashSet<Integer> acceptedNotes = new HashSet<Integer>();
 	
 	public Instrument(Integer index, String instrumentName, Integer instrumentID, String portName, String channel) {
 		this.index = index; //Location in Instruments collection
@@ -58,38 +57,54 @@ public class Instrument {
 	public String getChannel() {
 		return this.channel;
 	}
-	public List<Integer> getAcceptedNotes(){
+	public HashSet<Integer> getAcceptedNotes(){
 		return this.acceptedNotes;
 	}
 	
-	private List<Integer> lookUpNotes(Integer instrumentID){
-		List <Integer> noteList = new ArrayList<Integer>();
+	private HashSet<Integer> lookUpNotes(Integer instrumentID){
+		HashSet<Integer> noteHS = new HashSet<Integer>();
 		switch (instrumentID) {
 		case 1: 
-			noteList = Constants.snareNotes;
+			for (Integer note:Constants.snareNotes) {
+				noteHS.add(note);
+			}
 			break;
 		case 2: 
-			noteList = Constants.cHiHatNotes;
+			for (Integer note:Constants.cHiHatNotes) {
+				noteHS.add(note);
+			}
 			break;
-		case 3: 
-			noteList = Constants.oHiHatNotes;
+		case 3:
+			for (Integer note:Constants.oHiHatNotes) {
+				noteHS.add(note);
+			}
 			break;
-		case 4: 
-			noteList = Constants.bassNotes;
+		case 4:
+			for (Integer note:Constants.bassNotes) {
+				noteHS.add(note);
+			}
 			break;
-		case 5: 
-			noteList = Constants.lowTomNotes;
+		case 5:
+			for (Integer note:Constants.lowTomNotes) {
+				noteHS.add(note);
+			}
 			break;
-		case 6: 
-			noteList = Constants.highTomNotes;
+		case 6:
+			for (Integer note:Constants.highTomNotes) {
+				noteHS.add(note);
+			}
 			break;
-		case 7: 
-			noteList = Constants.rideNotes;
+		case 7:
+			for (Integer note : Constants.rideNotes) {
+				noteHS.add(note);
+			}
 			break;
-		case 8: 
-			noteList = Constants.crashNotes;
+		case 8:
+			for (Integer note : Constants.crashNotes) {
+				noteHS.add(note);
+			}
 			break;
 		}
-		return noteList;
+		return noteHS;
 	}
 }

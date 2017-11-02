@@ -25,7 +25,10 @@ import java.util.logging.Logger;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequence;
+import javax.sound.midi.Track;
+import javax.swing.text.StyledEditorKit.ForegroundAction;
 
 /**
  * This is player that can be "managed" - e.g., started, stopped, paused, resumed, seeked, and finished.
@@ -69,7 +72,7 @@ public class ManagedPlayer implements EndOfTrackListener
 	 */
 	public void start(Sequence sequence) throws InvalidMidiDataException, MidiUnavailableException {
 		common.openSequencer();
-//		common.connectSequencerToSynthesizer(); // TODO - TEST connectSequencerToSynthesizer in ManagedPlayer // 2016-03-07 THIS IS CAUSING A PROBLEM WITH DOUBLE-HIT NOTES!!!
+		common.connectSequencerToSynthesizer();
 		common.addEndOfTrackListener(this);
 		common.getSequencer().setSequence(sequence);
 		fireOnStarted(sequence);

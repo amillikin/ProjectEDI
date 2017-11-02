@@ -26,6 +26,7 @@ import javax.sound.midi.MetaEventListener;
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.Synthesizer;
 
@@ -94,19 +95,20 @@ public class SequencerManager {
 	}
 	
 	public void connectSequencerToSynthesizer() throws MidiUnavailableException {
-	    Synthesizer synth = SynthesizerManager.getInstance().getSynthesizer();
-	    if (synth == previousSynth) {
+		Synthesizer synth = SynthesizerManager.getInstance().getSynthesizer();
+	    Receiver passthroughRec = SynthesizerManager.getInstance().getPassthroughReceiver();
+	    /*if (synth == previousSynth) {
 	        return;
 	    }
 	    this.previousSynth = synth;
         if (!synth.isOpen()) {
             synth.open();
-        }
+        }*/
         Sequencer sequencer = openSequencer();
         if (sequencer.getTransmitter().getReceiver() != null) {
             sequencer.getTransmitter().getReceiver().close();
         }
-		openSequencer().getTransmitter().setReceiver(synth.getReceiver());
+		openSequencer().getTransmitter().setReceiver(passthroughRec);
 	}
 	
 	public void addEndOfTrackListener(EndOfTrackListener listener) {
