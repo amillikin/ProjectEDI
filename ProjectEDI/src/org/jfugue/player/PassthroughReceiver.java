@@ -1,6 +1,7 @@
 package org.jfugue.player;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -10,23 +11,27 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Synthesizer;
 
-import arduino.ArduinoCOM;
+import com.fazecast.jSerialComm.SerialPort;
+
 import instrument.Instrument;
-import instrument.Instruments;
-import instrument.Settings;
 
 public class PassthroughReceiver implements Receiver {
 	private Synthesizer synth;
 	private HashMap<Integer,Integer> arduinoNotes;
-	private List<Instrument> arduinoInstruments;
-	private List<ArduinoCOM> arduinoPorts;
-	//snarePort,closeHiHatPort,openHiHatPort,bassPort,lowTomPort,highTomPort,ridePort,crashPort;
+	private List<SerialPort> arduinoPorts;
+	private List<PrintWriter> arduinoPrintWriters;
 	
 	public PassthroughReceiver(Synthesizer synth) {
 		this.synth = synth;
-		this.arduinoNotes = Instruments.getInstrumentHashMap();
-		this.arduinoInstruments = Settings.loadSettings();
-		openArduinoPorts(getArduinoInstruments());
+		this.arduinoNotes = getArdNotes();
+		this.arduinoPorts = getPorts();
+		this.arduinoPrintWriters = getPrintWriters();
+		
+		try {
+			openSynthesizer(getSynthesizer());
+		} catch (MidiUnavailableException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void send(MidiMessage message, long lTimeStamp) {
@@ -42,22 +47,12 @@ public class PassthroughReceiver implements Receiver {
 		 * Else
 		 * 		Send message to synthesizer
 		*/ 
-		if (message instanceof ShortMessage && ((ShortMessage) message).getCommand() == 144) {// && 
-		  //((ShortMessage) message).getChannel() == 9 &&
-		  //((ShortMessage) message).getCommand() == 0x90 &&
-		  //arduinoNotes.containsKey(((ShortMessage) message).getData1())) {
-			//channel = ((ShortMessage) message).getChannel();
-			//command = ((ShortMessage) message).getCommand();
-			//note = ((ShortMessage) message).getData1();
-			for (Instrument instrument : arduinoInstruments) {
-				instrument.getPort().serialWrite(((ShortMessage) message).getData1());
+		if (message instanceof ShortMessage && ((ShortMessage) message).getChannel() == 9 && arduinoNotes.containsKey((((ShortMessage) message).getData1()))) {
+			if (((ShortMessage) message).getCommand() == 144) {
+				PrintWriter pout = new PrintWriter(arduinoPorts.get(arduinoNotes.get(((ShortMessage) message).getData1())).getOutputStream());
+				pout.write((char) ((ShortMessage) message).getData1());
+				pout.flush();
 			}
-			//arduinoInstruments.get(
-			//	arduinoNotes.get(
-			//		((ShortMessage) message).getData1()))
-			//			.getPort().serialWrite(arduinoInstruments.get(
-			//					arduinoNotes.get(
-			//						((ShortMessage) message).getData1())).getChannel());			
 		}
 		else {
 			try {
@@ -69,20 +64,65 @@ public class PassthroughReceiver implements Receiver {
 	}
 	
 	public void close(){
-		closeArduinoPorts(getArduinoInstruments());
+		try {
+			closeSynthesizer(getSynthesizer());
+		} catch (MidiUnavailableException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public List<Instrument> getArduinoInstruments() {
-		return this.arduinoInstruments;
+	private Synthesizer getSynthesizer() {
+		return this.synth;
 	}
 	
-	public static void openArduinoPorts(List<Instrument> arduinoInstruments) {
+	private SerialPort getComPort(String portDescription) {
+		SerialPort comPort = SerialPort.getCommPort(portDescription);
+		if (comPort.isOpen()) comPort.closePort();
+		comPort.setBaudRate(57600);
+		comPort.setFlowControl(SerialPort.FLOW_CONTROL_DTR_ENABLED|SerialPort.FLOW_CONTROL_DSR_ENABLED);
+		comPort.openPort();
+		return comPort;
+	}
+	
+	private List<SerialPort> getPorts() {
+		List<SerialPort> ports = new ArrayList<SerialPort>();
+		ports.add(getComPort("COM6")); //Snare
+		ports.add(getComPort("COM4")); //Bass
+		return ports;
+	}
+	
+	private List<PrintWriter> getPrintWriters() {
+		List<PrintWriter> printWriters = new ArrayList<PrintWriter>();
+		for (SerialPort port : arduinoPorts) {
+			PrintWriter pw = new PrintWriter(port.getOutputStream());
+			printWriters.add(pw);
+		}		
+		return printWriters;
+	}
+	
+	private HashMap<Integer,Integer> getArdNotes(){
+		HashMap<Integer,Integer> ardNotes = new HashMap<Integer,Integer>();
+		ardNotes.put(38, 0);
+		ardNotes.put(40, 0);
+		ardNotes.put(35, 1);
+		ardNotes.put(36, 1);
+		return ardNotes;
+	}
+	
+	private static void openSynthesizer(Synthesizer synth) throws MidiUnavailableException {
+		synth.open();
+	}
+	private static void closeSynthesizer(Synthesizer synth) throws MidiUnavailableException {
+		synth.close();
+	}
+	
+	private static void openArduinoPorts(List<Instrument> arduinoInstruments) {
 		for (Instrument instrument : arduinoInstruments) {
 			instrument.getPort().openConnection();
 		}
 	}
 	
-	public static void closeArduinoPorts(List<Instrument> arduinoInstruments) {
+	private static void closeArduinoPorts(List<Instrument> arduinoInstruments) {
 		for (Instrument instrument : arduinoInstruments) {
 			instrument.getPort().closeConnection();
 		}

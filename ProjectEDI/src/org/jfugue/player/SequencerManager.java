@@ -29,6 +29,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.Synthesizer;
+import javax.sound.midi.Transmitter;
 
 /**
  * This class provides operations done on a Sequencer for any
@@ -95,19 +96,14 @@ public class SequencerManager {
 	}
 	
 	public void connectSequencerToSynthesizer() throws MidiUnavailableException {
-		Synthesizer synth = SynthesizerManager.getInstance().getSynthesizer();
-	    Receiver passthroughRec = SynthesizerManager.getInstance().getPassthroughReceiver();
-	    /*if (synth == previousSynth) {
-	        return;
-	    }
-	    this.previousSynth = synth;
-        if (!synth.isOpen()) {
-            synth.open();
-        }*/
         Sequencer sequencer = openSequencer();
-        if (sequencer.getTransmitter().getReceiver() != null) {
-            sequencer.getTransmitter().getReceiver().close();
+        for (Receiver rec : sequencer.getReceivers()) {
+	        if (rec != null) {
+	            rec.close();
+	        }
         }
+        
+	    Receiver passthroughRec = SynthesizerManager.getInstance().getPassthroughReceiver();
 		openSequencer().getTransmitter().setReceiver(passthroughRec);
 	}
 	
