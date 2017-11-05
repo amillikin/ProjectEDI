@@ -21,6 +21,8 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 
 import java.io.File;
@@ -120,7 +122,8 @@ public class MainWindow {
 	private static Scene createScene() {
 		Group root = new Group();
 		Scene scene = new Scene(root, Color.ALICEBLUE);
-		//MediaPlayer mp = new MediaPlayer();
+		MediaView mv = new MediaView();
+		
 		return scene;
 		
 	}

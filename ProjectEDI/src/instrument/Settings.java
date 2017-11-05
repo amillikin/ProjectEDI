@@ -77,19 +77,15 @@ public class Settings {
 			instrumentsRoot.appendChild(newInstrument);
 			
 			//Instrument Name
-			Element instrumentName = doc.createElement("NAME");
-			instrumentName.appendChild(doc.createTextNode(instrument.getName()));
-			newInstrument.appendChild(instrumentName);
+			//Element instrumentName = doc.createElement("NAME");
+			//instrumentName.appendChild(doc.createTextNode(instrument.getName()));
+			//newInstrument.appendChild(instrumentName);
 			
 			//Port Name
 			Element portName = doc.createElement("PORT");
 			portName.appendChild(doc.createTextNode(instrument.getPort().getPortDescription()));
 			newInstrument.appendChild(portName);
-			
-			//Channel
-			Element channel = doc.createElement("CHANNEL");
-			channel.appendChild(doc.createTextNode(instrument.getChannel()));
-			newInstrument.appendChild(channel);
+
 		}
 		return doc;
 	}
@@ -104,23 +100,18 @@ public class Settings {
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element instrumentElement = (Element) node;
 				Integer id;
-				String instrumentName;
 				String portName;
-				String channel;
 				
 				//Index
 				id = Integer.parseInt(instrumentElement.getAttribute("id"));
 				
 				//Instrument Name
-				instrumentName = instrumentElement.getElementsByTagName("NAME").item(0).getTextContent();
+				//instrumentName = instrumentElement.getElementsByTagName("NAME").item(0).getTextContent();
 				
 				//Port Name
 				portName = instrumentElement.getElementsByTagName("PORT").item(0).getTextContent();
 				
-				//Channel
-				channel = instrumentElement.getElementsByTagName("CHANNEL").item(0).getTextContent();
-				
-				Instrument instrument = new Instrument(i, instrumentName, id, portName, channel);
+				Instrument instrument = new Instrument(id, portName);
 				instruments.add(instrument);
 			}
 		}

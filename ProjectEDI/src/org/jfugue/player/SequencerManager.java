@@ -28,8 +28,6 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
-import javax.sound.midi.Synthesizer;
-import javax.sound.midi.Transmitter;
 
 /**
  * This class provides operations done on a Sequencer for any
@@ -46,12 +44,10 @@ public class SequencerManager {
 	}
 
 	private Sequencer sequencer;
-	private Synthesizer previousSynth;
     private CopyOnWriteArrayList<EndOfTrackListener> endOfTrackListeners;
 
 	private SequencerManager() throws MidiUnavailableException { 
 		this.sequencer = getDefaultSequencer();
-		this.previousSynth = SynthesizerManager.getInstance().getSynthesizer();
 		endOfTrackListeners = new CopyOnWriteArrayList<EndOfTrackListener>();
 	}
 	
@@ -96,15 +92,14 @@ public class SequencerManager {
 	}
 	
 	public void connectSequencerToSynthesizer() throws MidiUnavailableException {
-        Sequencer sequencer = openSequencer();
-        for (Receiver rec : sequencer.getReceivers()) {
+        for (Receiver rec : getSequencer().getReceivers()) {
 	        if (rec != null) {
 	            rec.close();
 	        }
         }
         
 	    Receiver passthroughRec = SynthesizerManager.getInstance().getPassthroughReceiver();
-		openSequencer().getTransmitter().setReceiver(passthroughRec);
+	    getSequencer().getTransmitter().setReceiver(passthroughRec);
 	}
 	
 	public void addEndOfTrackListener(EndOfTrackListener listener) {

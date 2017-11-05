@@ -60,8 +60,7 @@ public class ArduinoCOM {
 	
 	public SerialPort getSerialPort(){
 		return comPort;
-	}
-	
+	}	
 	
 	public String serialRead(){
 		//will be an infinite loop if incoming data is not bound
