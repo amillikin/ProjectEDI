@@ -18,12 +18,9 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JComboBox;
 import java.awt.event.ActionListener;
-import javax.swing.JCheckBox;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.awt.event.ItemEvent;
 
 public class SerialConfig extends JDialog {
@@ -130,7 +127,6 @@ public class SerialConfig extends JDialog {
 		portSnare.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				if (isAPIUpdate) return;
-				//fillComboBox(Constants.SNARE, cBoxPortSnare.getSelectedItem().toString());
 				if (portSnare.getSelectedItem().toString().startsWith("COM")) {
 					sendTestSnare.setEnabled(true);
 				} else {
@@ -141,7 +137,6 @@ public class SerialConfig extends JDialog {
 		portCHiHat.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				if (isAPIUpdate) return;
-				//fillComboBox(Constants.CLOSED_HI_HAT,cBoxPortCHiHat.getSelectedItem().toString());
 				if (portCHiHat.getSelectedItem().toString().startsWith("COM")) {
 					sendTestCHiHat.setEnabled(true);
 				} else {
@@ -152,7 +147,6 @@ public class SerialConfig extends JDialog {
 		portOHiHat.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				if (isAPIUpdate) return;
-				//fillComboBox(Constants.OPEN_HI_HAT,cBoxPortOHiHat.getSelectedItem().toString());
 				if (portOHiHat.getSelectedItem().toString().startsWith("COM")) {
 					sendTestOHiHat.setEnabled(true);
 				} else {
@@ -163,7 +157,6 @@ public class SerialConfig extends JDialog {
 		portBass.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				if (isAPIUpdate) return;
-				//fillComboBox(Constants.BASS,cBoxPortBass.getSelectedItem().toString());
 				if (portBass.getSelectedItem().toString().startsWith("COM")) {
 					sendTestBass.setEnabled(true);
 				} else {
@@ -174,7 +167,6 @@ public class SerialConfig extends JDialog {
 		portToms.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				if (isAPIUpdate) return;
-				//fillComboBox(Constants.TOMS,cBoxPortToms.getSelectedItem().toString());
 				if (portToms.getSelectedItem().toString().startsWith("COM")) {
 					sendTestToms.setEnabled(true);
 				} else {
@@ -185,7 +177,6 @@ public class SerialConfig extends JDialog {
 		portCymbals.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				if (isAPIUpdate) return;
-				//fillComboBox(Constants.CYMBALS,cBoxPortCymbals.getSelectedItem().toString());
 				if (portCymbals.getSelectedItem().toString().startsWith("COM")) {
 					sendTestCymbals.setEnabled(true);
 				} else {
@@ -365,6 +356,15 @@ public class SerialConfig extends JDialog {
 		fillComboBox(Constants.CYMBALS,"");
 	}
 	
+	private void clearAllComboBoxes() {
+		getComboBox(Constants.SNARE).removeAllItems();
+		getComboBox(Constants.CLOSED_HI_HAT).removeAllItems();
+		getComboBox(Constants.OPEN_HI_HAT).removeAllItems();
+		getComboBox(Constants.BASS).removeAllItems();
+		getComboBox(Constants.TOMS).removeAllItems();
+		getComboBox(Constants.CYMBALS).removeAllItems();
+	}
+	
 	private boolean isPortSelected(SerialPort port) {
 		// Checks if a given port is already selected when re-populating port comboboxes
 		if (portSnare.getSelectedItem().toString().equals(port.getSystemPortName())) {
@@ -416,6 +416,9 @@ public class SerialConfig extends JDialog {
 	private void findPorts() {
 		String portReturn = null;
 		String systemPortName = null;
+		
+		clearAllComboBoxes();
+		
 		for (SerialPort port : SerialPort.getCommPorts()) {
 			systemPortName = port.getSystemPortName();
 			ArduinoCOM portToTest = new ArduinoCOM(systemPortName);

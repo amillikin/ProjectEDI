@@ -19,12 +19,28 @@ public class PassthroughReceiver implements Receiver {
 	private HashMap<Integer,PrintWriter> arduinoPrintWriters;
 	private List<Instrument> arduinoInstruments;
 	private int printWriterIndex;
+	private int synthDelay;
 	
 	public PassthroughReceiver(Synthesizer synth) {
 		this.synth = synth;
-		this.arduinoInstruments = Instruments.getInstruments();//Settings.loadSettings();
+		this.arduinoInstruments = Instruments.getInstruments();
 		this.arduinoNotes = fillArduinoNotes();
 		this.arduinoPrintWriters = fillPrintWriters();
+		this.synthDelay = 0;
+		
+		try {
+			getSynthesizer().open();
+		} catch (MidiUnavailableException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public PassthroughReceiver(Synthesizer synth, int delay) {
+		this.synth = synth;
+		this.arduinoInstruments = Instruments.getInstruments();
+		this.arduinoNotes = fillArduinoNotes();
+		this.arduinoPrintWriters = fillPrintWriters();
+		this.synthDelay = delay;
 		
 		try {
 			getSynthesizer().open();
@@ -59,6 +75,7 @@ public class PassthroughReceiver implements Receiver {
 		}
 		else {
 			try {
+				try{Thread.sleep(getDelay());} catch(Exception e){}
 				getSynthesizer().getReceiver().send(message, lTimeStamp);
 			} catch (MidiUnavailableException e) {
 				e.printStackTrace();
@@ -75,6 +92,10 @@ public class PassthroughReceiver implements Receiver {
 	
 	private Synthesizer getSynthesizer() {
 		return this.synth;
+	}
+	
+	private int getDelay() {
+		return this.synthDelay;
 	}
 	
 	private List<Instrument> getInstruments(){

@@ -26,10 +26,10 @@ import javax.sound.midi.Synthesizer;
 
 public class SynthesizerManager {
 	private static SynthesizerManager instance;
-
-	public static SynthesizerManager getInstance() throws MidiUnavailableException {
+	
+	public static SynthesizerManager getInstance(int synthDelay) throws MidiUnavailableException {
 		if (instance == null) {
-			instance = new SynthesizerManager();
+			instance = new SynthesizerManager(synthDelay);
 		}
 		return instance;
 	}
@@ -37,9 +37,9 @@ public class SynthesizerManager {
 	private Synthesizer synth;
 	private Receiver passthroughRec;
 
-	private SynthesizerManager() throws MidiUnavailableException {
+	private SynthesizerManager(int synthDelay) throws MidiUnavailableException {
 		this.synth = getDefaultSynthesizer();
-		this.passthroughRec = new PassthroughReceiver(synth);
+		this.passthroughRec = new PassthroughReceiver(getSynthesizer(), synthDelay);
 	}
 	
 	public Synthesizer getDefaultSynthesizer() throws MidiUnavailableException {
@@ -52,6 +52,14 @@ public class SynthesizerManager {
 	
 	public Synthesizer getSynthesizer() {
 		return this.synth;
+	}
+	
+	public void setDefaultPassthroughReceiver() {
+		this.passthroughRec = new PassthroughReceiver(getSynthesizer());
+	}
+	
+	public void setPassthroughReceiver(int synthDelay) {
+		this.passthroughRec = new PassthroughReceiver(getSynthesizer(), synthDelay);
 	}
 	
 	public Receiver getPassthroughReceiver() {

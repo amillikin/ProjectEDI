@@ -30,6 +30,8 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.Track;
 import javax.swing.text.StyledEditorKit.ForegroundAction;
 
+import javafx.scene.Parent;
+
 /**
  * This is player that can be "managed" - e.g., started, stopped, paused, resumed, seeked, and finished.
  * Additionally, the state of this player can be requested.
@@ -41,6 +43,7 @@ public class ManagedPlayer implements EndOfTrackListener
 	private boolean started;
 	private boolean finished;
 	private boolean paused;
+	private int synthDelay;
 
     private CopyOnWriteArrayList<ManagedPlayerListener> playerListeners;
     
@@ -48,6 +51,7 @@ public class ManagedPlayer implements EndOfTrackListener
     	playerListeners = new CopyOnWriteArrayList<ManagedPlayerListener>();
     	try {
     		common = SequencerManager.getInstance();
+    		this.synthDelay = 0;
     	} catch (MidiUnavailableException e) {
     		Logger.getLogger("org.jfugue").severe(e.getLocalizedMessage());
     	}
@@ -64,6 +68,10 @@ public class ManagedPlayer implements EndOfTrackListener
 	public List<ManagedPlayerListener> getManagedPlayerListeners() {
 	    return playerListeners;
 	}
+	
+	public void setSynthDelay(int synthDelay) {
+		this.synthDelay = synthDelay;
+	}
 
 	/**
 	 * This method opens the sequencer (if it is not already open - @see PlayerCommon),  
@@ -72,7 +80,7 @@ public class ManagedPlayer implements EndOfTrackListener
 	 */
 	public void start(Sequence sequence) throws InvalidMidiDataException, MidiUnavailableException {
 		common.openSequencer();
-		common.connectSequencerToSynthesizer();
+		common.connectSequencerToSynthesizer(synthDelay);
 		common.addEndOfTrackListener(this);
 		common.getSequencer().setSequence(sequence);
 		fireOnStarted(sequence);
@@ -118,7 +126,7 @@ public class ManagedPlayer implements EndOfTrackListener
         this.finished = false;
         fireOnReset();
     }
-    
+        
     public long getTickLength() {
     	return common.getSequencer().getTickLength();
     }

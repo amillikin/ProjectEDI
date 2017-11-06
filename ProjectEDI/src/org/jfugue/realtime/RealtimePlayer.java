@@ -49,7 +49,7 @@ public class RealtimePlayer
 	private RealtimeMidiParserListener rtMidiParserListener;
 	
 	public RealtimePlayer() throws MidiUnavailableException {
-        this.synth = SynthesizerManager.getInstance().getSynthesizer();
+        this.synth = SynthesizerManager.getInstance(0).getSynthesizer();
         this.synth.open();
     	this.channels = this.synth.getChannels();
 

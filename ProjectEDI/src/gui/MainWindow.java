@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.text.NumberFormatter;
 
 import org.jfugue.midi.MidiFileManager;
 import org.jfugue.player.ManagedPlayer;
@@ -12,6 +13,7 @@ import org.jfugue.player.ManagedPlayer;
 import java.awt.BorderLayout;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -26,8 +28,20 @@ import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JScrollPane;
+import javax.swing.JPanel;
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Sequence;
+import javax.swing.JButton;
+import javax.swing.JSlider;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 public class MainWindow {
 
@@ -38,36 +52,67 @@ public class MainWindow {
 	private final JMenuItem mntmLoad = new JMenuItem("Load");
 	private final JMenuItem mntmSaveAs = new JMenuItem("SaveAs");
 	private final JMenuItem mntmSave = new JMenuItem("Save");
-	private final JMenu mnToolbars = new JMenu("Toolbars");
-	private final JMenuItem mntmMusic = new JMenuItem("Music");
 	private final JMenu mnOptions = new JMenu("Options");
 	private final JMenuItem mntmSerialComPort = new JMenuItem("Serial COM Port Configuration");
 	private final JMenu mnHelp = new JMenu("Help");
 	private final JMenuItem mntmAbout = new JMenuItem("About");
 	private final JScrollPane scrollPane = new JScrollPane();
 	private final JFXPanel fxPanel = new JFXPanel();
+	private final JPanel panel = new JPanel();
+	private final JButton btnPlay = new JButton("Play");
+	private final JButton btnPause = new JButton("Pause");
+	private final JButton btnStop = new JButton("Stop");
+	private final JSlider slider = new JSlider();
+	private final JLabel lblSongDuration = new JLabel("00:00");
+	private final static JLabel lblSongTitle = new JLabel("Current Song Title");
+	private JFormattedTextField delay;
+	private final JLabel lblDelay = new JLabel("Delay:");
+	
+	private static ManagedPlayer mplayer = new ManagedPlayer();
+	private static List<File> playlist = new ArrayList<File>();
 	
 	public MainWindow() {
+		NumberFormat fmt = NumberFormat.getInstance();
+		NumberFormatter nf = new NumberFormatter(fmt);
+		nf.setValueClass(Integer.class);
+		nf.setMinimum(0);
+		nf.setMaximum(Integer.MAX_VALUE);
+		nf.setAllowsInvalid(false);
+		nf.setCommitsOnValidEdit(false);
+		delay = new JFormattedTextField(nf);
+		delay.setHorizontalAlignment(SwingConstants.CENTER);
+		delay.setToolTipText("Synthesizer Delay");
+		delay.setColumns(3);
+		
 		initialize();
 	}
 
 	public void initialize() {
 		//mainWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
 		mainWindow.setTitle("ProjectEDI");
-		mainWindow.setBounds(100, 100, 300, 100);
+		mainWindow.setBounds(100, 100, 310, 150);
 		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainWindow.setJMenuBar(menuBar);
 		mainWindow.getContentPane().add(scrollPane, BorderLayout.WEST);
-		mainWindow.add(fxPanel);
+		mainWindow.getContentPane().add(panel, BorderLayout.CENTER);
+		
+		panel.add(btnPlay);
+		panel.add(btnPause);
+		panel.add(btnStop);
+		
+		panel.add(lblDelay);
+		
+		panel.add(delay);
+		panel.add(slider);
+		panel.add(lblSongDuration);
+		panel.add(lblSongTitle);
+		//mainWindow.getContentPane().add(fxPanel);
 		
 		menuBar.add(mnFile);
 		mnFile.add(mntmNew);
 		mnFile.add(mntmLoad);
 		mnFile.add(mntmSaveAs);
 		mnFile.add(mntmSave);
-		
-		menuBar.add(mnToolbars);
-		mnToolbars.add(mntmMusic);
 		
 		menuBar.add(mnOptions);
 		mnOptions.add(mntmSerialComPort);
@@ -105,12 +150,41 @@ public class MainWindow {
 			}
 		});
 		
-		Platform.runLater(new Runnable() {
+		btnPlay.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (playlist.size() > 0) {
+					mplayer = new ManagedPlayer();
+					mplayer.setSynthDelay(Integer.parseInt(delay.getText()));
+					try {
+						mplayer.start(MidiFileManager.load(playlist.get(0)));
+					} catch (InvalidMidiDataException | MidiUnavailableException | IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		
+		btnPause.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (mplayer.isPlaying()) mplayer.pause();
+			}
+		});
+		
+		btnStop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (mplayer.isPlaying()) mplayer.finish();
+			}
+		});
+		
+		
+		
+		/*Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				initFX(fxPanel);
 			}
-		});
+		});*/
 				
 	}
 	
@@ -143,8 +217,9 @@ public class MainWindow {
 			int retVal = fc.showOpenDialog(null);
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				ManagedPlayer mplayer = new ManagedPlayer();
-				mplayer.start(MidiFileManager.load(file));
+				playlist.clear();
+				playlist.add(file);
+				lblSongTitle.setText(playlist.get(0).getName());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
