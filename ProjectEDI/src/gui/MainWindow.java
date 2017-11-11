@@ -120,6 +120,8 @@ public class MainWindow {
 		menuBar.add(mnHelp);
 		mnHelp.add(mntmAbout);
 		
+		slider.setValue(0);
+		
 		mntmNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mntmNew_Clicked(arg0);
@@ -152,16 +154,31 @@ public class MainWindow {
 		
 		btnPlay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (playlist.size() > 0) {
-					mplayer = new ManagedPlayer();
-					mplayer.setSynthDelay(Integer.parseInt(delay.getText()));
-					try {
-						mplayer.start(MidiFileManager.load(playlist.get(0)));
-					} catch (InvalidMidiDataException | MidiUnavailableException | IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+				if (mplayer.isPaused()) {
+					mplayer.resume();
+				} 
+				else {
+					if (playlist.size() > 0) {
+						mplayer = new ManagedPlayer();
+						
+						try {
+							mplayer.setSynthDelay(Integer.parseInt(delay.getText()));
+						}
+						catch (Exception e1){
+							mplayer.setSynthDelay(0);
+						}
+						
+						mplayer.getTickLength();
+						
+						try {
+							mplayer.start(MidiFileManager.load(playlist.get(0)));
+						} catch (InvalidMidiDataException | MidiUnavailableException | IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 					}
 				}
+
 			}
 		});
 		

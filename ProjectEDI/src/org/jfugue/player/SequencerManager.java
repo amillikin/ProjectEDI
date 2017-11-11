@@ -28,6 +28,7 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.Transmitter;
 
 /**
  * This class provides operations done on a Sequencer for any
@@ -92,12 +93,11 @@ public class SequencerManager {
 	}
 	
 	public void connectSequencerToSynthesizer(int synthDelay) throws MidiUnavailableException {
-        for (Receiver rec : getSequencer().getReceivers()) {
-	        if (rec != null) {
-	            rec.close();
-	        }
-        }
-
+		//for (Transmitter transmitter : getSequencer().getTransmitters()) {
+	        //if (transmitter.getReceiver() != null) {
+	        //    transmitter.getReceiver().close();
+	        //}
+	     //}
 	    Receiver passthroughRec = SynthesizerManager.getInstance(synthDelay).getPassthroughReceiver();
 	    getSequencer().getTransmitter().setReceiver(passthroughRec);
 	}

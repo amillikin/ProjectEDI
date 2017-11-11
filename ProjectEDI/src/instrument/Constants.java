@@ -15,11 +15,26 @@ public class Constants {
 	public static List<Integer> cymbalNotes = new ArrayList<Integer>(Stream.of(49,57,51,59).collect(Collectors.toList()));
 	
 	//Instrument IDs
-	public static final Integer SNARE = 0;
-	public static final Integer CLOSED_HI_HAT = 1;
-	public static final Integer OPEN_HI_HAT = 2;
-	public static final Integer BASS = 3;
-	public static final Integer TOMS = 4;
-	public static final Integer CYMBALS = 5;
+	public static final Integer SNARE = 0; //48 ASCII
+	public static final Integer CLOSED_HI_HAT = 1; //49 ASCII
+	public static final Integer OPEN_HI_HAT = 2; //50 ASCII
+	public static final Integer BASS = 3; //51 ASCII
+	public static final Integer TOMS = 4; //52 ASCII
+	public static final Integer CYMBALS = 5; //53 ASCII
 
+	
+	//41 Low Tom 2
+	//43 Low Tom 1
+	//45 Mid Tom 2
+	//47 Mid Tom 1
+	//48 High Tom 2
+	//50 High Tom 1
+	
+	//51 Ride Cymbal 1
+	//59 Ride Cymbal 2
+	
+	//49 Crash Cymbal 1
+	//57 Crash Cymbal 2
+	
+	
 }

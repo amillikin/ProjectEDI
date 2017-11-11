@@ -61,25 +61,17 @@ public class PassthroughReceiver implements Receiver {
 		 * 			Do Nothing i.e. don't handle anything but note ons
 		 * Else
 		 * 		Send message to synthesizer
-		*/ 
+		*/		
 		if (message instanceof ShortMessage && ((ShortMessage) message).getChannel() == 9 && arduinoNotes.containsKey((((ShortMessage) message).getData1()))) {
-			if (((ShortMessage) message).getCommand() == 144) {
+			if (((ShortMessage) message).getCommand() == 144 && ((ShortMessage) message).getData2() > 0) {
 				printWriterIndex = arduinoNotes.get(((((ShortMessage) message).getData1())));
-				getPrintWriters().get(printWriterIndex).write('A');
+				try{Thread.sleep(getDelay());} catch(Exception e){}
+				getPrintWriters().get(printWriterIndex).write(((ShortMessage) message).getData1());
 				getPrintWriters().get(printWriterIndex).flush();
-				//for (PrintWriter pw : getPrintWriters()) {
-					//pw.write((char) ((ShortMessage) message).getData1());
-					//pw.flush();
-				//}
 			}
 		}
 		else {
-			try {
-				try{Thread.sleep(getDelay());} catch(Exception e){}
-				getSynthesizer().getReceiver().send(message, lTimeStamp);
-			} catch (MidiUnavailableException e) {
-				e.printStackTrace();
-			}
+
 		}
 	}
 	

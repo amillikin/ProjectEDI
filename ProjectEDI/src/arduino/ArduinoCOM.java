@@ -35,8 +35,8 @@ public class ArduinoCOM {
 			return true;
 		}
 		else {
-			AlertWindow alert = new AlertWindow(new Dimension(400,100),"Error Connecting", "Try Another port");
-			alert.display();
+			//AlertWindow alert = new AlertWindow(new Dimension(400,100),"Error Connecting", "Try Another port");
+			//alert.display();
 			return false;
 		}
 	}
@@ -100,7 +100,6 @@ public class ArduinoCOM {
 		PrintWriter pout = new PrintWriter(comPort.getOutputStream());
 		pout.print(s);
 		pout.flush();
-		
 	}
 	public void serialWrite(String s,int noOfChars, int delay){
 		//writes the entire string, 'noOfChars' characters at a time, 

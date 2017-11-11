@@ -189,42 +189,42 @@ public class SerialConfig extends JDialog {
 			public void actionPerformed(ActionEvent arg0) {
 				if (portSnare.getSelectedItem().toString().startsWith("COM")
 						) {
-					sendCOMTest(portSnare.getSelectedItem().toString());
+					sendCOMTest(portSnare.getSelectedItem().toString(), Constants.snareNotes);
 				}
 			}
 		});
 		sendTestCHiHat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (portCHiHat.getSelectedItem().toString().startsWith("COM")) {
-					sendCOMTest(portCHiHat.getSelectedItem().toString());
+					sendCOMTest(portCHiHat.getSelectedItem().toString(),Constants.cHiHatNotes);
 				}
 			}
 		});
 		sendTestOHiHat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (portOHiHat.getSelectedItem().toString().startsWith("COM")) {
-					sendCOMTest(portOHiHat.getSelectedItem().toString());
+					sendCOMTest(portOHiHat.getSelectedItem().toString(), Constants.oHiHatNotes);
 				}
 			}
 		});
 		sendTestBass.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (portBass.getSelectedItem().toString().startsWith("COM")){
-					sendCOMTest(portBass.getSelectedItem().toString());
+					sendCOMTest(portBass.getSelectedItem().toString(), Constants.bassNotes);
 				}
 			}
 		});
 		sendTestToms.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (portToms.getSelectedItem().toString().startsWith("COM")){
-					sendCOMTest(portToms.getSelectedItem().toString());
+					sendCOMTest(portToms.getSelectedItem().toString(), Constants.tomNotes);
 				}
 			}
 		});
 		sendTestCymbals.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (portCymbals.getSelectedItem().toString().startsWith("COM")){
-					sendCOMTest(portCymbals.getSelectedItem().toString());
+					sendCOMTest(portCymbals.getSelectedItem().toString(), Constants.cymbalNotes);
 				}
 			}
 		});
@@ -357,12 +357,14 @@ public class SerialConfig extends JDialog {
 	}
 	
 	private void clearAllComboBoxes() {
+		isAPIUpdate = true;
 		getComboBox(Constants.SNARE).removeAllItems();
 		getComboBox(Constants.CLOSED_HI_HAT).removeAllItems();
 		getComboBox(Constants.OPEN_HI_HAT).removeAllItems();
 		getComboBox(Constants.BASS).removeAllItems();
 		getComboBox(Constants.TOMS).removeAllItems();
 		getComboBox(Constants.CYMBALS).removeAllItems();
+		isAPIUpdate = false;
 	}
 	
 	private boolean isPortSelected(SerialPort port) {
@@ -385,10 +387,13 @@ public class SerialConfig extends JDialog {
 		
 	}
 	
-	private void sendCOMTest(String portToTest) {
+	private void sendCOMTest(String portToTest, List<Integer> notesToTest) {
 		ArduinoCOM port = new ArduinoCOM(portToTest);
 		port.openConnection();
-		port.serialWrite('A');
+		for (int note : notesToTest) {
+			port.serialWrite((char)note);
+			try{Thread.sleep(100);} catch(Exception e){}
+		}
 		port.closeConnection();
 	}
 
@@ -414,10 +419,11 @@ public class SerialConfig extends JDialog {
 	}
 	
 	private void findPorts() {
-		String portReturn = null;
-		String systemPortName = null;
+		String portReturn = "";
+		String systemPortName = "";
 		
 		clearAllComboBoxes();
+		fillAllComboBoxes();
 		
 		for (SerialPort port : SerialPort.getCommPorts()) {
 			systemPortName = port.getSystemPortName();
@@ -429,6 +435,7 @@ public class SerialConfig extends JDialog {
 			int instrumentID = Integer.parseInt(portReturn.substring(0, 1));
 			if (instrumentID >= 0 && instrumentID <= 5) {
 				fillComboBox(instrumentID, systemPortName);
+				
 			}
 			
 		}
