@@ -22,14 +22,15 @@ package org.jfugue.player;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
+import javax.sound.midi.Soundbank;
 import javax.sound.midi.Synthesizer;
 
 public class SynthesizerManager {
 	private static SynthesizerManager instance;
 	
-	public static SynthesizerManager getInstance(int synthDelay) throws MidiUnavailableException {
+	public static SynthesizerManager getInstance() throws MidiUnavailableException {
 		if (instance == null) {
-			instance = new SynthesizerManager(synthDelay);
+			instance = new SynthesizerManager();
 		}
 		return instance;
 	}
@@ -37,9 +38,9 @@ public class SynthesizerManager {
 	private Synthesizer synth;
 	private Receiver passthroughRec;
 
-	private SynthesizerManager(int synthDelay) throws MidiUnavailableException {
+	private SynthesizerManager() throws MidiUnavailableException {
 		this.synth = getDefaultSynthesizer();
-		this.passthroughRec = new PassthroughReceiver(getSynthesizer(), synthDelay);
+		this.passthroughRec = new PassthroughReceiver(getSynthesizer());
 	}
 	
 	public Synthesizer getDefaultSynthesizer() throws MidiUnavailableException {
@@ -58,12 +59,8 @@ public class SynthesizerManager {
 		this.passthroughRec = new PassthroughReceiver(getSynthesizer());
 	}
 	
-	public void setPassthroughReceiver(int synthDelay) {
-		this.passthroughRec = new PassthroughReceiver(getSynthesizer(), synthDelay);
-	}
-	
 	public Receiver getPassthroughReceiver() {
 		return this.passthroughRec;
-	}
+	}	
 	
 }

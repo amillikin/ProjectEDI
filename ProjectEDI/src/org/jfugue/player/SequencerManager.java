@@ -92,13 +92,13 @@ public class SequencerManager {
 		}
 	}
 	
-	public void connectSequencerToSynthesizer(int synthDelay) throws MidiUnavailableException {
+	public void connectSequencerToSynthesizer() throws MidiUnavailableException {
 		//for (Transmitter transmitter : getSequencer().getTransmitters()) {
 	        //if (transmitter.getReceiver() != null) {
 	        //    transmitter.getReceiver().close();
 	        //}
 	     //}
-	    Receiver passthroughRec = SynthesizerManager.getInstance(synthDelay).getPassthroughReceiver();
+	    Receiver passthroughRec = SynthesizerManager.getInstance().getPassthroughReceiver();
 	    getSequencer().getTransmitter().setReceiver(passthroughRec);
 	}
 	

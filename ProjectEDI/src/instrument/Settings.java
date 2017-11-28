@@ -21,13 +21,13 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Settings {
-	public static void saveSettings(List<Instrument> instruments) {
+	public static void saveSettings(List<Instrument> instruments, String delay) {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		try {
 			//Make Settings Document
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 			Document doc = docBuilder.newDocument();
-			doc = makeDocument(doc, instruments);
+			doc = makeDocument(doc, instruments, delay);
 			
 			//Write Settings Document
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -41,10 +41,9 @@ public class Settings {
 		} catch (TransformerException te) {
 			te.printStackTrace();
 		}
-
 	}
 	
-	public static List<Instrument> loadSettings() {
+	public static List<Instrument> loadInstruments() {
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		try {
@@ -53,7 +52,7 @@ public class Settings {
 			File settingsFile = new File(System.getProperty("user.dir").replace("\\", "/") + "/settings.xml");
 			if (!settingsFile.exists()) return instruments;
 			Document doc = docBuilder.parse(settingsFile);
-			instruments = parseDoc(doc);
+			instruments = parseDocInstruments(doc);
 			
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -65,7 +64,28 @@ public class Settings {
 		return instruments;
 	}
 	
-	private static Document makeDocument(Document doc, List<Instrument> instruments) {
+	public static int loadDelay() {
+		int delay = 0;
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		try {
+			//Read Settings Document
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			File settingsFile = new File(System.getProperty("user.dir").replace("\\", "/") + "/settings.xml");
+			if (!settingsFile.exists()) return delay;
+			Document doc = docBuilder.parse(settingsFile);
+			delay = parseDocDelay(doc);
+			
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		}
+		return delay;
+	}
+	
+	private static Document makeDocument(Document doc, List<Instrument> instruments, String delay) {
 		Element instrumentsRoot = doc.createElement("INSTRUMENTS");
 		doc.appendChild(instrumentsRoot);
 		for (Instrument instrument : instruments) {
@@ -76,21 +96,20 @@ public class Settings {
 			newInstrument.setAttribute("id", id);
 			instrumentsRoot.appendChild(newInstrument);
 			
-			//Instrument Name
-			//Element instrumentName = doc.createElement("NAME");
-			//instrumentName.appendChild(doc.createTextNode(instrument.getName()));
-			//newInstrument.appendChild(instrumentName);
-			
 			//Port Name
 			Element portName = doc.createElement("PORT");
 			portName.appendChild(doc.createTextNode(instrument.getPort().getPortDescription()));
 			newInstrument.appendChild(portName);
 
 		}
+		Element instrumentDelay = doc.createElement("DELAY");
+		instrumentDelay.setAttribute("val", delay);
+		instrumentsRoot.appendChild(instrumentDelay);
+		
 		return doc;
 	}
 	
-	private static List<Instrument> parseDoc(Document doc) {
+	private static List<Instrument> parseDocInstruments(Document doc) {
 		List<Instrument> instruments = new ArrayList<Instrument>();
 		doc.getDocumentElement().normalize();
 		NodeList nList = doc.getElementsByTagName("INSTRUMENT");
@@ -105,9 +124,6 @@ public class Settings {
 				//Index
 				id = Integer.parseInt(instrumentElement.getAttribute("id"));
 				
-				//Instrument Name
-				//instrumentName = instrumentElement.getElementsByTagName("NAME").item(0).getTextContent();
-				
 				//Port Name
 				portName = instrumentElement.getElementsByTagName("PORT").item(0).getTextContent();
 				
@@ -115,7 +131,21 @@ public class Settings {
 				instruments.add(instrument);
 			}
 		}
-		
 		return instruments;
+	}
+	
+	private static int parseDocDelay(Document doc) {
+		int delay = 0;
+		doc.getDocumentElement().normalize();
+		NodeList nList = doc.getElementsByTagName("DELAY");
+		
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node node = nList.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element delayElement = (Element) node;
+				delay = Integer.parseInt(delayElement.getAttribute("val"));
+			}
+		}
+		return delay;
 	}
 }

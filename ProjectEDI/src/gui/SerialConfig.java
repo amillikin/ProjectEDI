@@ -19,9 +19,12 @@ import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ItemEvent;
+import javax.swing.JFormattedTextField;
+import javax.swing.SwingConstants;
 
 public class SerialConfig extends JDialog {
 	/*TODO: FIX Port comboboxes to remove selected items
@@ -55,6 +58,9 @@ public class SerialConfig extends JDialog {
 	
 	private  List<Instrument> instruments = new ArrayList<Instrument>();
 	private Boolean isAPIUpdate;
+	private NumberFormat nbrfmt = NumberFormat.getNumberInstance();
+	private JFormattedTextField txtDelay;
+	private final JLabel lblDelay = new JLabel("Delay:");
 	
 	public SerialConfig() {
 		initialize();
@@ -82,8 +88,17 @@ public class SerialConfig extends JDialog {
 		getContentPane().add(lblToms, "cell 0 5,alignx center,aligny center");
 		lblRideaCrash.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
+		getContentPane().add(lblDelay, "flowx,cell 2 8");
+		nbrfmt.setMaximumIntegerDigits(3);
+		txtDelay = new JFormattedTextField(nbrfmt);
+		txtDelay.setToolTipText("Arduino Delay");
+		txtDelay.setHorizontalAlignment(SwingConstants.CENTER);
+		txtDelay.setColumns(3);
+		txtDelay.setText("0");
+		
+		getContentPane().add(txtDelay, "cell 2 8");		
 		getContentPane().add(lblRideaCrash, "cell 0 6,alignx center");
-		getContentPane().add(buttonPane, "cell 0 8,alignx left,aligny top");
+		getContentPane().add(buttonPane, "flowx,cell 0 8,alignx left,aligny top");
 		getContentPane().add(lblInstrument, "cell 0 0,alignx center,aligny center");
 		getContentPane().add(lblPort, "cell 1 0,alignx center,aligny center");
 		getContentPane().add(lblSendTest, "cell 2 0,alignx center,aligny center");
@@ -269,7 +284,9 @@ public class SerialConfig extends JDialog {
 					Instrument instrument = new Instrument(Constants.CYMBALS, portCymbals.getSelectedItem().toString());
 					getInstrumentList().add(instrument);
 				}
-				if (getInstrumentList().size() > 0) Settings.saveSettings(instruments);
+				String delay = txtDelay.getText();
+				if (delay.isEmpty()) delay = "0";
+				if (getInstrumentList().size() > 0) Settings.saveSettings(instruments, delay);
 				dispose();
 
 			}
@@ -400,7 +417,7 @@ public class SerialConfig extends JDialog {
 	private void importSavedInstruments() {
 		fillAllComboBoxes();
 		
-		for (Instrument instrument : Settings.loadSettings()) {
+		for (Instrument instrument : Settings.loadInstruments()) {
 			switch (instrument.getInstrumentID()) {
 				case 0: fillComboBox(Constants.SNARE,instrument.getPort().getPortDescription());
 					break;

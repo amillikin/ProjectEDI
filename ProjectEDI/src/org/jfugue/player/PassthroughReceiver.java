@@ -26,21 +26,7 @@ public class PassthroughReceiver implements Receiver {
 		this.arduinoInstruments = Instruments.getInstruments();
 		this.arduinoNotes = fillArduinoNotes();
 		this.arduinoPrintWriters = fillPrintWriters();
-		this.synthDelay = 0;
-		
-		try {
-			getSynthesizer().open();
-		} catch (MidiUnavailableException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public PassthroughReceiver(Synthesizer synth, int delay) {
-		this.synth = synth;
-		this.arduinoInstruments = Instruments.getInstruments();
-		this.arduinoNotes = fillArduinoNotes();
-		this.arduinoPrintWriters = fillPrintWriters();
-		this.synthDelay = delay;
+		this.synthDelay = Instruments.getDelay();
 		
 		try {
 			getSynthesizer().open();

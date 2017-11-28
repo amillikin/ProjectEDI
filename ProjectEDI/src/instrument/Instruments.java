@@ -17,7 +17,7 @@ public class Instruments {
 	public static HashMap<Integer, Integer> getInstrumentHashMap() {
 		HashMap<Integer, Integer> instrumentHM = new HashMap<Integer, Integer>();
 		
-		for (Instrument instrument : Settings.loadSettings()) {
+		for (Instrument instrument : Settings.loadInstruments()) {
 			for (Integer instrumentNote : instrument.getAcceptedNotes()) {
 				instrumentHM.put(instrumentNote,instrument.getInstrumentID());	
 			}
@@ -28,13 +28,17 @@ public class Instruments {
 	
 	public static List<Instrument> getInstruments(){
 		List<Instrument> savedInstruments = new ArrayList<Instrument>();
-		savedInstruments = Settings.loadSettings();
+		savedInstruments = Settings.loadInstruments();
 		if (savedInstruments.isEmpty()) {
 			return autoFindInstruments();
 		}
 		else {
 			return savedInstruments;
 		}
+	}
+	
+	public static int getDelay(){
+		return Settings.loadDelay();
 	}
 	
 	public static List<Instrument> autoFindInstruments(){
@@ -58,7 +62,8 @@ public class Instruments {
 				instruments.add(instrument);
 			}
 		}
-		Settings.saveSettings(instruments);
+		//Defaults delay to 0 ms
+		Settings.saveSettings(instruments, "0");
 		return instruments;
 	}
 }

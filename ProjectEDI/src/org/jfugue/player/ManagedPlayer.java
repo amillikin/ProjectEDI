@@ -43,7 +43,6 @@ public class ManagedPlayer implements EndOfTrackListener
 	private boolean started;
 	private boolean finished;
 	private boolean paused;
-	private int synthDelay;
 
     private CopyOnWriteArrayList<ManagedPlayerListener> playerListeners;
     
@@ -51,7 +50,6 @@ public class ManagedPlayer implements EndOfTrackListener
     	playerListeners = new CopyOnWriteArrayList<ManagedPlayerListener>();
     	try {
     		common = SequencerManager.getInstance();
-    		this.synthDelay = 0;
     	} catch (MidiUnavailableException e) {
     		Logger.getLogger("org.jfugue").severe(e.getLocalizedMessage());
     	}
@@ -68,10 +66,6 @@ public class ManagedPlayer implements EndOfTrackListener
 	public List<ManagedPlayerListener> getManagedPlayerListeners() {
 	    return playerListeners;
 	}
-	
-	public void setSynthDelay(int synthDelay) {
-		this.synthDelay = synthDelay;
-	}
 
 	/**
 	 * This method opens the sequencer (if it is not already open - @see PlayerCommon),  
@@ -80,7 +74,7 @@ public class ManagedPlayer implements EndOfTrackListener
 	 */
 	public void start(Sequence sequence) throws InvalidMidiDataException, MidiUnavailableException {
 		common.openSequencer();
-		common.connectSequencerToSynthesizer(synthDelay);
+		common.connectSequencerToSynthesizer();
 		common.addEndOfTrackListener(this);
 		common.getSequencer().setSequence(sequence);
 		fireOnStarted(sequence);
