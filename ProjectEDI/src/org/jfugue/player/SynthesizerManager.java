@@ -19,16 +19,19 @@
 
 package org.jfugue.player;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
-import javax.sound.midi.Soundbank;
 import javax.sound.midi.Synthesizer;
 
 public class SynthesizerManager {
 	private static SynthesizerManager instance;
 	
-	public static SynthesizerManager getInstance() throws MidiUnavailableException {
+	public static SynthesizerManager getInstance() throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		if (instance == null) {
 			instance = new SynthesizerManager();
 		}
@@ -38,13 +41,17 @@ public class SynthesizerManager {
 	private Synthesizer synth;
 	private Receiver passthroughRec;
 
-	private SynthesizerManager() throws MidiUnavailableException {
+	private SynthesizerManager() throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		this.synth = getDefaultSynthesizer();
 		this.passthroughRec = new PassthroughReceiver(getSynthesizer());
 	}
 	
-	public Synthesizer getDefaultSynthesizer() throws MidiUnavailableException {
-		return MidiSystem.getSynthesizer();
+	public Synthesizer getDefaultSynthesizer() throws MidiUnavailableException, InvalidMidiDataException, IOException {
+		Synthesizer newSynth = MidiSystem.getSynthesizer();
+		newSynth.open();
+		newSynth.unloadAllInstruments(newSynth.getDefaultSoundbank());
+		newSynth.loadAllInstruments(MidiSystem.getSoundbank(new File("C:\\Users\\Lyfja\\Favorites\\Documents\\EDI MIDIS\\SGM-V2.01.sf2")));
+		return newSynth;
 	}
 	
 	public void setSynthesizer(Synthesizer synth) {

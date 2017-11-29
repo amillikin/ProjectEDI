@@ -19,15 +19,19 @@
 
 package org.jfugue.player;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaEventListener;
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.Soundbank;
+import javax.sound.midi.Synthesizer;
 import javax.sound.midi.Transmitter;
 
 /**
@@ -92,15 +96,18 @@ public class SequencerManager {
 		}
 	}
 	
-	public void connectSequencerToSynthesizer() throws MidiUnavailableException {
-		//for (Transmitter transmitter : getSequencer().getTransmitters()) {
-	        //if (transmitter.getReceiver() != null) {
-	        //    transmitter.getReceiver().close();
-	        //}
-	     //}
+	public void connectSequencerToSynthesizer() throws MidiUnavailableException, InvalidMidiDataException, IOException {
 	    Receiver passthroughRec = SynthesizerManager.getInstance().getPassthroughReceiver();
-	    getSequencer().getTransmitter().setReceiver(passthroughRec);
+	    //getSequencer().getTransmitter().setReceiver(passthroughRec);
+		for (Transmitter transmitter : getSequencer().getTransmitters()) {
+	      if (transmitter.getReceiver() != null) {
+	            transmitter.getReceiver().close();
+	            transmitter.setReceiver(passthroughRec);
+	        }
+	     }
 	}
+	
+	
 	
 	public void addEndOfTrackListener(EndOfTrackListener listener) {
 		endOfTrackListeners.add(listener);

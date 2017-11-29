@@ -27,12 +27,12 @@ public class PassthroughReceiver implements Receiver {
 		this.arduinoNotes = fillArduinoNotes();
 		this.arduinoPrintWriters = fillPrintWriters();
 		this.synthDelay = Instruments.getDelay();
-		
+		/*
 		try {
 			getSynthesizer().open();
 		} catch (MidiUnavailableException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	public void send(MidiMessage message, long lTimeStamp) {
@@ -57,8 +57,13 @@ public class PassthroughReceiver implements Receiver {
 			}
 		}
 		else {
-
-		}
+			try {
+				try{Thread.sleep(getDelay());} catch(Exception e){}
+				getSynthesizer().getReceiver().send(message, lTimeStamp);
+			} catch (MidiUnavailableException e) {
+				e.printStackTrace();
+			}
+		}	
 	}
 	
 	public void close(){

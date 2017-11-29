@@ -1,10 +1,12 @@
 package gui;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.TableColumn;
 
 import org.jfugue.midi.MidiFileManager;
 import org.jfugue.player.ManagedPlayer;
@@ -16,6 +18,8 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import javax.swing.JMenuItem;
 
@@ -31,16 +35,27 @@ import javax.swing.JButton;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
+
 import javax.swing.JTable;
+import javax.swing.Timer;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JCheckBox;
 
 public class MainWindow {
 
 	public final JFrame mainWindow = new JFrame();
 	private final JMenuBar menuBar = new JMenuBar();
 	private final JMenu mnFile = new JMenu("File");
-	private final JMenuItem mntmNew = new JMenuItem("New");
+	private final JMenuItem mntmNew = new JMenuItem("New ");
 	private final JMenuItem mntmLoad = new JMenuItem("Load");
 	private final JMenuItem mntmSaveAs = new JMenuItem("SaveAs");
 	private final JMenuItem mntmSave = new JMenuItem("Save");
@@ -50,13 +65,18 @@ public class MainWindow {
 	private final JButton btnPlay = new JButton("Play");
 	private final JButton btnPause = new JButton("Pause");
 	private final JButton btnStop = new JButton("Stop");
-	
-	private static ManagedPlayer mplayer = new ManagedPlayer();
-	private static List<Song> playlist = new ArrayList<Song>();
-	private static JTable playlistTable = new JTable(1,3);
 	private final JPanel MediaControlPanel = new JPanel();
 	private final JPanel MediaButtonsPanel = new JPanel();
-	private final JProgressBar trackBar = new JProgressBar();
+	private final JScrollPane scrollPane = new JScrollPane(playlistTable);
+	private final DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+	
+	private static Timer timer;
+	private static ManagedPlayer mplayer = new ManagedPlayer();
+	private static List<Song> playlist = new ArrayList<Song>();
+	private static JTable playlistTable = new JTable(0,3);
+	private static JProgressBar trackBar = new JProgressBar();
+	private static int activeTrackIndex = -1;
+	private static JCheckBox chckbxLoop = new JCheckBox("Loop Track");
 	
 	public MainWindow() {		
 		initialize();
@@ -68,6 +88,7 @@ public class MainWindow {
 		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainWindow.setJMenuBar(menuBar);
 		mainWindow.getContentPane().add(mainPanel, BorderLayout.CENTER);
+		
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{350, 0};
 		gbl_panel.rowHeights = new int[]{0, 70, 0};
@@ -80,25 +101,21 @@ public class MainWindow {
 		gbc_playlistTable.fill = GridBagConstraints.BOTH;
 		gbc_playlistTable.gridx = 0;
 		gbc_playlistTable.gridy = 0;
-		playlistTable.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"#", "Title", "Duration"
-			}
-		));
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		playlistTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		playlistTable.setModel(new UneditableTableModel());
+		playlistTable.getColumnModel().getColumn(0).setPreferredWidth(20);
+		playlistTable.getColumnModel().getColumn(0).setMinWidth(20);
+		playlistTable.getColumnModel().getColumn(0).setMaxWidth(20);
+		playlistTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		playlistTable.getColumnModel().getColumn(1).setPreferredWidth(279);
+		playlistTable.getColumnModel().getColumn(1).setMinWidth(31);
+		playlistTable.getColumnModel().getColumn(2).setPreferredWidth(51);
+		playlistTable.getColumnModel().getColumn(2).setMinWidth(51);
+		playlistTable.getColumnModel().getColumn(2).setMaxWidth(51);
+		playlistTable.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 		playlistTable.setFillsViewportHeight(true);
-		/*TableColumn tc1 = new TableColumn();
-		tc1.setHeaderValue("#");
-		TableColumn tc2 = new TableColumn();
-		tc2.setHeaderValue("Title");
-		TableColumn tc3 = new TableColumn();
-		tc3.setHeaderValue("Duration");
-		playlistTable.addColumn(tc1);
-		playlistTable.addColumn(tc2);
-		playlistTable.addColumn(tc3);
-		playlistTable.addRowSelectionInterval(0, 1);*/
-		mainPanel.add(playlistTable, gbc_playlistTable);
+		mainPanel.add(scrollPane, gbc_playlistTable);
 		
 		GridBagConstraints gbc_MediaControlPanel = new GridBagConstraints();
 		gbc_MediaControlPanel.fill = GridBagConstraints.BOTH;
@@ -119,7 +136,7 @@ public class MainWindow {
 		gbc_trackBar.gridy = 0;
 		trackBar.setStringPainted(true);
 		trackBar.setValue(0);
-		trackBar.setString("00:00 - 00:00");
+		trackBar.setString("0:00 - 0:00");
 		MediaControlPanel.add(trackBar, gbc_trackBar);
 		
 		GridBagConstraints gbc_MediaButtonsPanel = new GridBagConstraints();
@@ -128,9 +145,9 @@ public class MainWindow {
 		gbc_MediaButtonsPanel.gridy = 1;
 		MediaControlPanel.add(MediaButtonsPanel, gbc_MediaButtonsPanel);
 		GridBagLayout gbl_MediaButtonsPanel = new GridBagLayout();
-		gbl_MediaButtonsPanel.columnWidths = new int[]{0, 0, 0, 0};
+		gbl_MediaButtonsPanel.columnWidths = new int[]{0, 0, 0, 0, 0};
 		gbl_MediaButtonsPanel.rowHeights = new int[]{0, 0};
-		gbl_MediaButtonsPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_MediaButtonsPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_MediaButtonsPanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
 		MediaButtonsPanel.setLayout(gbl_MediaButtonsPanel);
 		GridBagConstraints gbc_btnPlay = new GridBagConstraints();
@@ -144,98 +161,127 @@ public class MainWindow {
 		gbc_btnPause.gridy = 0;
 		MediaButtonsPanel.add(btnPause, gbc_btnPause);
 		GridBagConstraints gbc_btnStop = new GridBagConstraints();
+		gbc_btnStop.insets = new Insets(0, 0, 0, 5);
 		gbc_btnStop.gridx = 2;
 		gbc_btnStop.gridy = 0;
 		MediaButtonsPanel.add(btnStop, gbc_btnStop);
 		
-		btnStop.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (mplayer.isPlaying()) mplayer.finish();
-			}
-		});
-		
-		btnPause.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (mplayer.isPlaying()) mplayer.pause();
-			}
-		});
-		
-		btnPlay.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (mplayer.isPaused()) {
-					mplayer.resume();
-				} 
-				else {
-					if (playlist.size() > 0) {
-						mplayer = new ManagedPlayer();
-						trackBar.setString("00:00 - " + playlist.get(0).getSongLengthLbl());
-						try {
-							mplayer.start(MidiFileManager.load(playlist.get(0).getSongPath()));
-						} catch (InvalidMidiDataException | MidiUnavailableException | IOException e1) {
-							e1.printStackTrace();
-						}
+				btnStop.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						btnStop_Clicked();
 					}
-				}
-
-			}
-		});
+				});
+		
+		GridBagConstraints gbc_chckbxLoop = new GridBagConstraints();
+		gbc_chckbxLoop.gridx = 3;
+		gbc_chckbxLoop.gridy = 0;
+		MediaButtonsPanel.add(chckbxLoop, gbc_chckbxLoop);
 		
 		menuBar.add(mnFile);
 		mnFile.add(mntmNew);
 		mnFile.add(mntmLoad);
 		mnFile.add(mntmSaveAs);
 		mnFile.add(mntmSave);
-		
 		menuBar.add(mnOptions);
 		mnOptions.add(mntmSerialComPort);
 		
+		trackBar.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e){
+				trackBar_Clicked(e);
+			}
+		});
+		
+		trackBar.addMouseMotionListener(new MouseAdapter() {
+			public void mouseMoved(MouseEvent e) {
+				trackBar_MouseMoved(e);
+			}
+		});
+		
+		btnPause.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnPause_Clicked();
+			}
+		});
+		
+		btnPlay.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnPlay_Clicked();
+			}
+		});
+		
 		mntmNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mntmNew_Clicked(arg0);
+				mntmNew_Clicked();
 			}
 		});
 		
 		mntmLoad.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mntmLoad_Clicked(arg0);
+				mntmLoad_Clicked();
 			}
 		});
 	 
 		mntmSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mntmSaveAs_Clicked(arg0);
+				mntmSaveAs_Clicked();
 			}
 		});
 		
 		mntmSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mntmSave_Clicked(arg0);
+				mntmSave_Clicked();
 			}
 		});
 				
 		mntmSerialComPort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mntmSerialComPort_Clicked(arg0);
+				mntmSerialComPort_Clicked();
+			}
+		});
+		
+		playlistTable.setDropTarget(new DropTarget() {
+			@Override
+			public synchronized void drop(DropTargetDropEvent dtde) {
+				playListFileDrop(dtde);
+			}
+		});
+		
+		playlistTable.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					btnPlay_Clicked();	
+				}
+			}
+		});
+		
+		timer = new Timer(500, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				timerEvent();
 			}
 		});
 	}
 	
-	private static void mntmNew_Clicked(ActionEvent arg0) {
+	private static void mntmNew_Clicked() {
 		try {
-			
+			ScoreWindow scoreWindow = new ScoreWindow();
+			scoreWindow.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			scoreWindow.pack();
+			scoreWindow.setModal(true);				
+			scoreWindow.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private static void mntmLoad_Clicked(ActionEvent arg0) {
+	private static void mntmLoad_Clicked() {
 		try {
 			JFileChooser fc = new JFileChooser();
+			FileFilter filter = new FileNameExtensionFilter("MIDI File","mid");
 			fc.setCurrentDirectory(FileSystemView.getFileSystemView().getDefaultDirectory());
+			fc.setFileFilter(filter);
 			int retVal = fc.showOpenDialog(null);
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				//playlist.clear();
 				playlist.add(new Song(file));
 				addSongToTable(playlist.get(playlist.size()-1));
 			}
@@ -244,7 +290,7 @@ public class MainWindow {
 		}
 	}
 	
-	private static void mntmSaveAs_Clicked(ActionEvent arg0) {
+	private static void mntmSaveAs_Clicked() {
 		try {
 			JFileChooser fc = new JFileChooser();
 			fc.setCurrentDirectory(FileSystemView.getFileSystemView().getDefaultDirectory());
@@ -258,7 +304,7 @@ public class MainWindow {
 		}
 	}
 	
-	private static void mntmSave_Clicked(ActionEvent arg0) {
+	private static void mntmSave_Clicked() {
 		try {
 			//If file exists, save file, else, prompt with SaveAs dialog
 		} catch (Exception e) {
@@ -266,7 +312,7 @@ public class MainWindow {
 		}
 	}
 	
-	private static void mntmSerialComPort_Clicked(ActionEvent arg0) {
+	private static void mntmSerialComPort_Clicked() {
 		try {
 			SerialConfig configWindow = new SerialConfig();
 			configWindow.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -278,8 +324,128 @@ public class MainWindow {
 		}
 	}
 	
+	private static void btnPlay_Clicked() {
+		if (mplayer.isPaused()) {
+			mplayer.resume();
+			timer.start();
+		} 
+		else {
+			if (mplayer.isPlaying()) mplayer.finish();
+			if (playlist.size() > 0 && playlistTable.getSelectedRow() > -1) {
+				mplayer = new ManagedPlayer();
+				activeTrackIndex = playlistTable.getSelectedRow();
+				trackBar.setString("0:00 - " + playlist.get(activeTrackIndex).getSongLengthLbl());
+				trackBar.setValue(0);
+				try {
+					mplayer.start(MidiFileManager.load(playlist.get(activeTrackIndex).getSongPath()));
+					timer.start();
+				} catch (InvalidMidiDataException | MidiUnavailableException | IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	private static void btnPause_Clicked() {
+		if (mplayer.isPlaying()) {
+			timer.stop();
+			mplayer.pause();
+		}
+	}
+	
+	private static void btnStop_Clicked() {
+		if (mplayer.isPlaying()) {
+			timer.stop();
+			mplayer.finish();
+			trackBar.setValue(0);
+			trackBar.setString("0:00 - " + playlist.get(playlistTable.getSelectedRow()).getSongLengthLbl());
+		}
+		else if (mplayer.isPaused()) {
+			mplayer.finish();
+			trackBar.setValue(0);
+			trackBar.setString("0:00 - " + playlist.get(playlistTable.getSelectedRow()).getSongLengthLbl());
+		}
+	}
+	
+	private static void timerEvent() {
+		double tickRatio = (double)mplayer.getTickPosition()/(double)mplayer.getTickLength();
+		trackBar.setString(
+				formatTrackPosition(tickRatio)
+				+ " - " 
+				+ playlist.get(activeTrackIndex).getSongLengthLbl());
+		trackBar.setValue((int) (tickRatio*100));
+		if (mplayer.isFinished()) {
+			timer.stop();
+			if (chckbxLoop.isSelected()) {
+				btnPlay_Clicked();
+			}
+		}
+	}
+	
+	private static void trackBar_Clicked(MouseEvent arg0) {
+		updateTrackBar(arg0);
+	}
+	
+	private static void trackBar_MouseMoved(MouseEvent arg0) {
+		if (activeTrackIndex == -1) return;
+		int mouseX = arg0.getX();
+		int newPos = (int)Math.round(((double)mouseX / (double)trackBar.getWidth()) * trackBar.getMaximum());
+		double percentPos = (double) newPos/100.0;
+		trackBar.setToolTipText(formatTrackPosition(percentPos));
+	}
+	
+	private static void updateTrackBar(MouseEvent arg0) {
+		if (activeTrackIndex == -1) return;
+		int mouseX = arg0.getX();
+		int newPos = (int)Math.round(((double)mouseX / (double)trackBar.getWidth()) * trackBar.getMaximum());
+		double percentPos = (double) newPos/100.0;
+		trackBar.setValue(newPos);
+		trackBar.setString(formatTrackPosition(percentPos) + " - " + playlist.get(activeTrackIndex).getSongLengthLbl());
+		long newTick = Math.round(playlist.get(activeTrackIndex).getTickLength() * percentPos);
+		if (mplayer.isFinished()) {
+			try {
+				mplayer.start(MidiFileManager.load(playlist.get(activeTrackIndex).getSongPath()));
+			} catch (InvalidMidiDataException | MidiUnavailableException | IOException e) {
+				e.printStackTrace();
+			}
+			mplayer.pause();
+		}
+		mplayer.seek(newTick);
+	}
+	
+	private static void playListFileDrop(DropTargetDropEvent dtde) {
+	    if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+	        dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+	        Transferable t = dtde.getTransferable();
+	        List fileList = null;
+	        try {
+	            fileList = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
+	            if (fileList != null && fileList.size() > 0) {
+	                for (Object value : fileList) {
+	                    if (value instanceof File) {
+	                        File file = (File) value;
+	                        playlist.add(new Song(file));
+	        				addSongToTable(playlist.get(playlist.size()-1));
+	                    }
+	                }
+	            }
+	        } catch (UnsupportedFlavorException e) {
+	            e.printStackTrace();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    } else {
+	        dtde.rejectDrop();
+	    }
+	}
+	
 	private static void addSongToTable(Song song) {
 		DefaultTableModel model = (DefaultTableModel) playlistTable.getModel();
-		model.addRow(new Object[] {"0",song.getSongTitle(),song.getSongLengthLbl()});
+		model.addRow(new Object[] {playlist.size(),song.getSongTitle(),song.getSongLengthLbl()});
+	}
+	
+	private static String formatTrackPosition(double percentPos) {
+		int newSeconds = (int)((double)playlist.get(activeTrackIndex).getSongLengthSeconds() * percentPos);
+		return String.format("%2d:%02d", (newSeconds % 3600) / 60, newSeconds % 60);
 	}
 }

@@ -19,6 +19,9 @@
 
 package org.jfugue.realtime;
 
+import java.io.IOException;
+
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Synthesizer;
@@ -48,7 +51,7 @@ public class RealtimePlayer
 	private StaccatoParser staccatoParser;
 	private RealtimeMidiParserListener rtMidiParserListener;
 	
-	public RealtimePlayer() throws MidiUnavailableException {
+	public RealtimePlayer() throws MidiUnavailableException, InvalidMidiDataException, IOException {
         this.synth = SynthesizerManager.getInstance().getSynthesizer();
         this.synth.open();
     	this.channels = this.synth.getChannels();

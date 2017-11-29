@@ -19,18 +19,14 @@
 
 package org.jfugue.player;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequence;
-import javax.sound.midi.Track;
-import javax.swing.text.StyledEditorKit.ForegroundAction;
-
-import javafx.scene.Parent;
 
 /**
  * This is player that can be "managed" - e.g., started, stopped, paused, resumed, seeked, and finished.
@@ -71,8 +67,9 @@ public class ManagedPlayer implements EndOfTrackListener
 	 * This method opens the sequencer (if it is not already open - @see PlayerCommon),  
 	 * sets the sequence, tells listeners that play is starting, and starts the sequence.
 	 * @param sequence
+	 * @throws IOException 
 	 */
-	public void start(Sequence sequence) throws InvalidMidiDataException, MidiUnavailableException {
+	public void start(Sequence sequence) throws InvalidMidiDataException, MidiUnavailableException, IOException {
 		common.openSequencer();
 		common.connectSequencerToSynthesizer();
 		common.addEndOfTrackListener(this);

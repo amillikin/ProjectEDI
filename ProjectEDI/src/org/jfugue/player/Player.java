@@ -19,6 +19,8 @@
 
 package org.jfugue.player;
 
+import java.io.IOException;
+
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequence;
@@ -98,6 +100,9 @@ public class Player
 			throw new RuntimeException(e);
 		} catch (MidiUnavailableException e) {
 			throw new RuntimeException(e);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		// Wait for the sequence to finish playing
