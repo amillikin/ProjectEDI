@@ -21,13 +21,13 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Settings {
-	public static void saveSettings(List<Instrument> instruments, String delay) {
+	public static void saveSettings(List<Instrument> instruments, String delay, String fontPath) {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		try {
 			//Make Settings Document
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 			Document doc = docBuilder.newDocument();
-			doc = makeDocument(doc, instruments, delay);
+			doc = makeDocument(doc, instruments, delay, fontPath);
 			
 			//Write Settings Document
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -85,7 +85,28 @@ public class Settings {
 		return delay;
 	}
 	
-	private static Document makeDocument(Document doc, List<Instrument> instruments, String delay) {
+	public static String loadSoundFontPath() {
+		String fontPath = "";
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		try {
+			//Read Settings Document
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			File settingsFile = new File(System.getProperty("user.dir").replace("\\", "/") + "/settings.xml");
+			if (!settingsFile.exists()) return fontPath;
+			Document doc = docBuilder.parse(settingsFile);
+			fontPath= parseDocSoundFontPath(doc);
+			
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		}
+		return fontPath;
+	}
+	
+	private static Document makeDocument(Document doc, List<Instrument> instruments, String delay, String fontPath) {
 		Element instrumentsRoot = doc.createElement("INSTRUMENTS");
 		doc.appendChild(instrumentsRoot);
 		for (Instrument instrument : instruments) {
@@ -105,6 +126,10 @@ public class Settings {
 		Element instrumentDelay = doc.createElement("DELAY");
 		instrumentDelay.setAttribute("val", delay);
 		instrumentsRoot.appendChild(instrumentDelay);
+		
+		Element midiSoundFont = doc.createElement("SOUNDFONT");
+		midiSoundFont.setAttribute("fontPath", fontPath);
+		instrumentsRoot.appendChild(midiSoundFont);
 		
 		return doc;
 	}
@@ -147,5 +172,20 @@ public class Settings {
 			}
 		}
 		return delay;
+	}
+	
+	private static String parseDocSoundFontPath(Document doc) {
+		String fontPath = "";
+		doc.getDocumentElement().normalize();
+		NodeList nList = doc.getElementsByTagName("SOUNDFONT");
+		
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node node = nList.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element soundFontElement = (Element) node;
+				fontPath = soundFontElement.getAttribute("fontPath");
+			}
+		}
+		return fontPath;
 	}
 }

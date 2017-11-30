@@ -63,7 +63,7 @@ public class Instruments {
 			}
 		}
 		//Defaults delay to 0 ms
-		Settings.saveSettings(instruments, "0");
+		Settings.saveSettings(instruments, "0", "");
 		return instruments;
 	}
 }

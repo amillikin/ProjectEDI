@@ -28,6 +28,8 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Synthesizer;
 
+import instrument.Settings;
+
 public class SynthesizerManager {
 	private static SynthesizerManager instance;
 	
@@ -46,11 +48,25 @@ public class SynthesizerManager {
 		this.passthroughRec = new PassthroughReceiver(getSynthesizer());
 	}
 	
-	public Synthesizer getDefaultSynthesizer() throws MidiUnavailableException, InvalidMidiDataException, IOException {
+	public Synthesizer getDefaultSynthesizer() throws MidiUnavailableException {
 		Synthesizer newSynth = MidiSystem.getSynthesizer();
+		String soundFontPath = Settings.loadSoundFontPath();
+		
 		newSynth.open();
-		newSynth.unloadAllInstruments(newSynth.getDefaultSoundbank());
-		newSynth.loadAllInstruments(MidiSystem.getSoundbank(new File("C:\\Users\\Lyfja\\Favorites\\Documents\\EDI MIDIS\\SGM-V2.01.sf2")));
+		if (!soundFontPath.equals("")) {
+			String executionDir = System.getProperty("user.dir");
+			File soundFont = new File(executionDir.replace("\\", "/") + "/soundfonts/" + soundFontPath);
+			try {
+				if (soundFont.exists() && newSynth.isSoundbankSupported(MidiSystem.getSoundbank(soundFont))) {
+					newSynth.unloadAllInstruments(newSynth.getDefaultSoundbank());
+					newSynth.loadAllInstruments(MidiSystem.getSoundbank(soundFont));
+				};
+			}
+			catch (InvalidMidiDataException | IOException e) {
+				e.printStackTrace();
+				return newSynth;
+			}
+		}
 		return newSynth;
 	}
 	

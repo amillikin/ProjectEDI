@@ -19,12 +19,14 @@ import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ItemEvent;
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingConstants;
+import javax.xml.transform.stream.StreamResult;
 
 public class SerialConfig extends JDialog {
 	/*TODO: FIX Port comboboxes to remove selected items
@@ -55,12 +57,14 @@ public class SerialConfig extends JDialog {
 	private final JLabel lblToms = new JLabel("Low Tom (A) High Tom (B)");
 	private final JLabel lblRideaCrash = new JLabel("Ride (A) Crash (B)");
 	private final JButton autoFind = new JButton("AUTO SELECT");
+	private final JLabel lblDelay = new JLabel("Delay:");
+	private final JComboBox<String> soundFontSelector = new JComboBox<String>();
+	private final JLabel lblMidiSoundfontSelector = new JLabel("MIDI SoundFont Selector");
 	
 	private  List<Instrument> instruments = new ArrayList<Instrument>();
 	private Boolean isAPIUpdate;
 	private NumberFormat nbrfmt = NumberFormat.getNumberInstance();
 	private JFormattedTextField txtDelay;
-	private final JLabel lblDelay = new JLabel("Delay:");
 	
 	public SerialConfig() {
 		initialize();
@@ -70,7 +74,7 @@ public class SerialConfig extends JDialog {
 		setTitle("Serial Port Configuration");
 		setBounds(100, 100, 430, 280);
 		setResizable(false);
-		getContentPane().setLayout(new MigLayout("", "[198.00][110.00][]", "[][30.00][][][][][][][]"));
+		getContentPane().setLayout(new MigLayout("", "[198.00][110.00][]", "[][30.00][][][][][][][][]"));
 		lblSnare.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		
 		getContentPane().add(lblSnare, "cell 0 1,alignx center,aligny center");
@@ -87,8 +91,15 @@ public class SerialConfig extends JDialog {
 		
 		getContentPane().add(lblToms, "cell 0 5,alignx center,aligny center");
 		lblRideaCrash.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblMidiSoundfontSelector.setHorizontalAlignment(SwingConstants.CENTER);
+		lblMidiSoundfontSelector.setFont(new Font("Tahoma", Font.BOLD, 13));
 		
-		getContentPane().add(lblDelay, "flowx,cell 2 8");
+		getContentPane().add(lblMidiSoundfontSelector, "cell 0 7,alignx center");
+		soundFontSelector.setToolTipText("SoundFont files must be in \"soundfonts\" folder in execution directory.");
+		
+		getContentPane().add(soundFontSelector, "cell 0 8,growx,aligny center");
+		
+		getContentPane().add(lblDelay, "flowx,cell 2 9");
 		nbrfmt.setMaximumIntegerDigits(3);
 		txtDelay = new JFormattedTextField(nbrfmt);
 		txtDelay.setToolTipText("Arduino Delay");
@@ -96,9 +107,9 @@ public class SerialConfig extends JDialog {
 		txtDelay.setColumns(3);
 		txtDelay.setText("0");
 		
-		getContentPane().add(txtDelay, "cell 2 8");		
+		getContentPane().add(txtDelay, "cell 2 9");		
 		getContentPane().add(lblRideaCrash, "cell 0 6,alignx center");
-		getContentPane().add(buttonPane, "flowx,cell 0 8,alignx left,aligny top");
+		getContentPane().add(buttonPane, "flowx,cell 0 9,alignx left,aligny top");
 		getContentPane().add(lblInstrument, "cell 0 0,alignx center,aligny center");
 		getContentPane().add(lblPort, "cell 1 0,alignx center,aligny center");
 		getContentPane().add(lblSendTest, "cell 2 0,alignx center,aligny center");
@@ -114,7 +125,7 @@ public class SerialConfig extends JDialog {
 		getContentPane().add(sendTestBass, "cell 2 4");
 		getContentPane().add(sendTestToms, "cell 2 5");
 		getContentPane().add(sendTestCymbals, "cell 2 6");
-		getContentPane().add(autoFind, "cell 1 8,alignx center,aligny center");
+		getContentPane().add(autoFind, "cell 1 9,alignx center,aligny center");
 		
 		lblInstrument.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPort.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -286,7 +297,7 @@ public class SerialConfig extends JDialog {
 				}
 				String delay = txtDelay.getText();
 				if (delay.isEmpty()) delay = "0";
-				if (getInstrumentList().size() > 0) Settings.saveSettings(instruments, delay);
+				Settings.saveSettings(instruments, delay, soundFontSelector.getSelectedItem().toString());
 				dispose();
 
 			}
@@ -298,7 +309,9 @@ public class SerialConfig extends JDialog {
 			}
 		});
 		
+		fillSoundFontSelector();
 		importSavedInstruments();
+		
 		this.pack();
 	}
 	
@@ -433,6 +446,16 @@ public class SerialConfig extends JDialog {
 					break;
 			}
 		}
+		selectSoundFont(Settings.loadSoundFontPath());
+	}
+	
+	private void selectSoundFont(String soundFontPath) {
+		for (int i = 0; i < soundFontSelector.getItemCount(); i++) {
+			if (soundFontSelector.getItemAt(i).toString().equals(soundFontPath)) {
+				soundFontSelector.setSelectedIndex(i);
+				return;
+			}
+		}
 	}
 	
 	private void findPorts() {
@@ -455,6 +478,17 @@ public class SerialConfig extends JDialog {
 				
 			}
 			
+		}
+	}
+	
+	private void fillSoundFontSelector() {
+		soundFontSelector.addItem("");
+		String executionDir = System.getProperty("user.dir");
+		File folder = new File(executionDir.replace("\\", "/") + "/soundfonts/");
+		if (folder.exists()) {
+			for (File file : folder.listFiles()) {
+				soundFontSelector.addItem(file.getName());
+			}
 		}
 	}
 }

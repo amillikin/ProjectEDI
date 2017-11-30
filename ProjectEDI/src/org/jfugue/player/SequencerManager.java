@@ -98,7 +98,6 @@ public class SequencerManager {
 	
 	public void connectSequencerToSynthesizer() throws MidiUnavailableException, InvalidMidiDataException, IOException {
 	    Receiver passthroughRec = SynthesizerManager.getInstance().getPassthroughReceiver();
-	    //getSequencer().getTransmitter().setReceiver(passthroughRec);
 		for (Transmitter transmitter : getSequencer().getTransmitters()) {
 	      if (transmitter.getReceiver() != null) {
 	            transmitter.getReceiver().close();
