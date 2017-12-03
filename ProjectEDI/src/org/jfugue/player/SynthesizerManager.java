@@ -26,6 +26,7 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
+import javax.sound.midi.Soundbank;
 import javax.sound.midi.Synthesizer;
 
 import instrument.Settings;
@@ -57,9 +58,12 @@ public class SynthesizerManager {
 			String executionDir = System.getProperty("user.dir");
 			File soundFont = new File(executionDir.replace("\\", "/") + "/soundfonts/" + soundFontPath);
 			try {
-				if (soundFont.exists() && newSynth.isSoundbankSupported(MidiSystem.getSoundbank(soundFont))) {
-					newSynth.unloadAllInstruments(newSynth.getDefaultSoundbank());
-					newSynth.loadAllInstruments(MidiSystem.getSoundbank(soundFont));
+				if (soundFont.exists() ) {
+					Soundbank soundBank = MidiSystem.getSoundbank(soundFont);
+					if (newSynth.isSoundbankSupported(soundBank)) {
+						newSynth.unloadAllInstruments(newSynth.getDefaultSoundbank());
+						newSynth.loadAllInstruments(MidiSystem.getSoundbank(soundFont));	
+					}
 				};
 			}
 			catch (InvalidMidiDataException | IOException e) {

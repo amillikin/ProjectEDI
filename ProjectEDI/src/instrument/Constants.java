@@ -22,7 +22,6 @@ public class Constants {
 	public static final Integer TOMS = 4; //52 ASCII
 	public static final Integer CYMBALS = 5; //53 ASCII
 
-	
 	//41 Low Tom 2
 	//43 Low Tom 1
 	//45 Mid Tom 2
@@ -34,7 +33,6 @@ public class Constants {
 	//59 Ride Cymbal 2
 	
 	//49 Crash Cymbal 1
-	//57 Crash Cymbal 2
-	
+	//57 Crash Cymbal 2	
 	
 }

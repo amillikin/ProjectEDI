@@ -11,6 +11,7 @@ import javax.swing.filechooser.FileSystemView;
 import org.jfugue.midi.MidiFileManager;
 import org.jfugue.player.ManagedPlayer;
 
+import playlist.Playlist;
 import playlist.Song;
 
 import java.awt.BorderLayout;
@@ -18,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
@@ -31,6 +33,9 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -43,12 +48,15 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.Timer;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JSeparator;
 
 public class MainWindow {
 
@@ -60,7 +68,7 @@ public class MainWindow {
 	private final JMenuItem mntmSaveAs = new JMenuItem("SaveAs");
 	private final JMenuItem mntmSave = new JMenuItem("Save");
 	private final JMenu mnOptions = new JMenu("Options");
-	private final JMenuItem mntmSerialComPort = new JMenuItem("Serial COM Port Configuration");
+	private final JMenuItem mntmSerialComPort = new JMenuItem("Settings");
 	private final JPanel mainPanel = new JPanel();
 	private final JButton btnPlay = new JButton("Play");
 	private final JButton btnPause = new JButton("Pause");
@@ -69,7 +77,10 @@ public class MainWindow {
 	private final JPanel MediaButtonsPanel = new JPanel();
 	private final JScrollPane scrollPane = new JScrollPane(playlistTable);
 	private final DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-	
+	private final JMenuItem mntmSequencer = new JMenuItem("Sequencer");
+	private final JSeparator separator = new JSeparator();
+	private static final FileFilter midiFilter = new FileNameExtensionFilter("MIDI/Playlist","mid","epl");
+		
 	private static Timer timer;
 	private static ManagedPlayer mplayer = new ManagedPlayer();
 	private static List<Song> playlist = new ArrayList<Song>();
@@ -77,6 +88,11 @@ public class MainWindow {
 	private static JProgressBar trackBar = new JProgressBar();
 	private static int activeTrackIndex = -1;
 	private static JCheckBox chckbxLoop = new JCheckBox("Loop Track");
+	private static File lastPlaylistFile = new File("");
+	
+	private final InputMap inputMap = playlistTable.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+	private final ActionMap actionMap = playlistTable.getActionMap();
+	private static final String DELETE = "DELETE";
 	
 	public MainWindow() {		
 		initialize();
@@ -164,14 +180,7 @@ public class MainWindow {
 		gbc_btnStop.insets = new Insets(0, 0, 0, 5);
 		gbc_btnStop.gridx = 2;
 		gbc_btnStop.gridy = 0;
-		MediaButtonsPanel.add(btnStop, gbc_btnStop);
-		
-				btnStop.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						btnStop_Clicked();
-					}
-				});
-		
+		MediaButtonsPanel.add(btnStop, gbc_btnStop);		
 		GridBagConstraints gbc_chckbxLoop = new GridBagConstraints();
 		gbc_chckbxLoop.gridx = 3;
 		gbc_chckbxLoop.gridy = 0;
@@ -182,6 +191,8 @@ public class MainWindow {
 		mnFile.add(mntmLoad);
 		mnFile.add(mntmSaveAs);
 		mnFile.add(mntmSave);
+		mnFile.add(separator);
+		mnFile.add(mntmSequencer);
 		menuBar.add(mnOptions);
 		mnOptions.add(mntmSerialComPort);
 		
@@ -209,6 +220,12 @@ public class MainWindow {
 			}
 		});
 		
+		btnStop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnStop_Clicked();
+			}
+		});
+		
 		mntmNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mntmNew_Clicked();
@@ -230,6 +247,12 @@ public class MainWindow {
 		mntmSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mntmSave_Clicked();
+			}
+		});
+		
+		mntmSequencer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mntmSequencer_Clicked();
 			}
 		});
 				
@@ -254,6 +277,13 @@ public class MainWindow {
 			}
 		});
 		
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), DELETE);
+		actionMap.put(DELETE, new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				deleteSongFromTable(playlistTable.getSelectedRow());
+			}
+		});
+		
 		timer = new Timer(500, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				timerEvent();
@@ -263,11 +293,13 @@ public class MainWindow {
 	
 	private static void mntmNew_Clicked() {
 		try {
-			ScoreWindow scoreWindow = new ScoreWindow();
-			scoreWindow.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			scoreWindow.pack();
-			scoreWindow.setModal(true);				
-			scoreWindow.setVisible(true);
+			lastPlaylistFile = new File("");
+			playlist.clear();
+			DefaultTableModel model = (DefaultTableModel) playlistTable.getModel();
+			for (int i = 0; i <= model.getRowCount(); i++) {
+				model.removeRow(i);
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -276,14 +308,23 @@ public class MainWindow {
 	private static void mntmLoad_Clicked() {
 		try {
 			JFileChooser fc = new JFileChooser();
-			FileFilter filter = new FileNameExtensionFilter("MIDI File","mid");
-			fc.setCurrentDirectory(FileSystemView.getFileSystemView().getDefaultDirectory());
-			fc.setFileFilter(filter);
+			fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+			fc.setFileFilter(midiFilter);
 			int retVal = fc.showOpenDialog(null);
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				playlist.add(new Song(file));
-				addSongToTable(playlist.get(playlist.size()-1));
+				if (file.getName().endsWith(".epl")) {
+					mntmNew_Clicked();
+					playlist = Playlist.loadPlaylist(file);
+					for (Song song : playlist) {
+						addSongToTable(song);
+					}
+				}
+				else if (file.getName().endsWith(".mid")) {
+					mntmNew_Clicked();
+					playlist.add(new Song(file));
+					addSongToTable(playlist.get(playlist.size()-1));
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -293,12 +334,13 @@ public class MainWindow {
 	private static void mntmSaveAs_Clicked() {
 		try {
 			JFileChooser fc = new JFileChooser();
-			fc.setCurrentDirectory(FileSystemView.getFileSystemView().getDefaultDirectory());
+			fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
 			int retVal = fc.showSaveDialog(null);
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				//Handle file to save
-			}
+				File saveFile = file.getName().endsWith(".epl") ? file : new File(file.getAbsolutePath() + ".epl");
+				Playlist.savePlaylist(playlist, saveFile);
+				}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -306,7 +348,24 @@ public class MainWindow {
 	
 	private static void mntmSave_Clicked() {
 		try {
-			//If file exists, save file, else, prompt with SaveAs dialog
+			if (lastPlaylistFile.exists()) {
+				Playlist.savePlaylist(playlist, lastPlaylistFile);
+			}
+			else {
+				mntmSaveAs_Clicked();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void mntmSequencer_Clicked() {
+		try {
+			ScoreWindow scoreWindow = new ScoreWindow();
+			scoreWindow.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			scoreWindow.pack();
+			scoreWindow.setModal(true);				
+			scoreWindow.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -424,8 +483,17 @@ public class MainWindow {
 	                for (Object value : fileList) {
 	                    if (value instanceof File) {
 	                        File file = (File) value;
-	                        playlist.add(new Song(file));
-	        				addSongToTable(playlist.get(playlist.size()-1));
+	                        if (file.getName().endsWith(".epl")) {
+	                        	int prevPLSize = playlist.size();
+	                        	playlist.addAll(Playlist.loadPlaylist(file));
+	                        	for (int i = prevPLSize; i < playlist.size(); i++) {
+	                        		addSongToTable(playlist.get(i));
+	                        	}
+	                        }
+	                        else if (file.getName().endsWith(".mid")) {
+		                        playlist.add(new Song(file));
+		        				addSongToTable(playlist.get(playlist.size()-1));
+	                        }
 	                    }
 	                }
 	            }
@@ -441,7 +509,22 @@ public class MainWindow {
 	
 	private static void addSongToTable(Song song) {
 		DefaultTableModel model = (DefaultTableModel) playlistTable.getModel();
-		model.addRow(new Object[] {playlist.size(),song.getSongTitle(),song.getSongLengthLbl()});
+		model.addRow(new Object[] {playlistTable.getRowCount()+1,song.getSongTitle(),song.getSongLengthLbl()});
+	}
+	
+	private static void deleteSongFromTable(int rowIndex) {
+		if (rowIndex == activeTrackIndex) {
+			timer.stop();
+			mplayer.finish();
+			trackBar.setValue(0);
+			trackBar.setString("0:00 - 0:00");
+		}
+		playlist.remove(rowIndex);
+		DefaultTableModel model = (DefaultTableModel) playlistTable.getModel();
+		model.removeRow(rowIndex);
+		for (int i = rowIndex+1; i <= model.getRowCount(); i++) {
+			model.setValueAt(i, i-1, 0);
+		}
 	}
 	
 	private static String formatTrackPosition(double percentPos) {

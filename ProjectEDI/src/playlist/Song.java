@@ -24,6 +24,14 @@ public class Song {
 		this.songPath = songPath;
 	}
 	
+	public Song (String songTitle, int songLengthSeconds, String songLengthLbl, long tickLength, File songPath) {
+		this.songTitle = songTitle;
+		this.songLengthSeconds = songLengthSeconds;
+		this.songLengthLbl = songLengthLbl;
+		this.tickLength = tickLength;
+		this.songPath = songPath;
+	}
+	
 	public String getSongTitle() {
 		return this.songTitle;
 	}

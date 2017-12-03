@@ -46,6 +46,7 @@ public class TemporalEvents
     public class TempoEvent implements TemporalEvent {
         private int tempoBPM;
         public TempoEvent(int tempoBPM) { this.tempoBPM = tempoBPM; }
+        public int getTempo() {return tempoBPM;}
         public void execute(Parser parser) { parser.fireTempoChanged(tempoBPM); }
     }
 
@@ -125,6 +126,7 @@ public class TemporalEvents
         private Note note;
         public NoteEvent(Note note) { this.note = note; }
         public void execute(Parser parser) { parser.fireNoteParsed(this.note); }
+        public byte getNoteValue() {return note.getValue();}
         public double getDuration() { return this.note.getDuration(); }
     }
 

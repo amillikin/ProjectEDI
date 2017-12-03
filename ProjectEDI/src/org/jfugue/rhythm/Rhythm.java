@@ -418,5 +418,28 @@ public class Rhythm implements PatternProducer
         put('x', "Rs [HAND_CLAP]s");
         put(' ', "Ri");
     }};
+    
+    
+	/*
+	 * 38: Snare
+	 * 42: Closed Hi-Hat
+	 * 46: Open Hi-Hat
+	 * 36: Bass
+	 * 45: Low Tom
+	 * 50: High Tom
+	 * 51: Ride Cymbal
+	 * 49: Crash Cymbal
+	 */
+    public static final Map<Character, String> ARDUINO_RHYTHM_KIT = new HashMap<Character, String>(){{
+        put('.', "Rq");
+        put('s', "[ACOUSTIC_SNARE]q");
+        put('d', "[CLOSED_HI_HAT]q");
+        put('o', "[OPEN_HI_HAT]q");
+        put('b', "[BASS_DRUM]q");
+        put('l', "[LO_TOM]q");
+        put('h', "[HI_TOM]q");
+        put('r', "[RIDE_CYMBAL_1]q");
+        put('c', "[CRASH_CYMBAL_1]q");
+    }};
 }
 
