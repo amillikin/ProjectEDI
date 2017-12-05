@@ -14,6 +14,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -32,6 +38,12 @@ import javax.swing.JButton;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
@@ -54,6 +66,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import java.awt.Component;
+
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -68,22 +82,29 @@ public class ScoreWindow extends JDialog {
 	private final JMenuItem mntmSave = new JMenuItem("Save");
     private final JButton btnPlay = new JButton("Play");
     private final JButton btnStop = new JButton("Stop");
-    private final static JCheckBox chckbxLoop = new JCheckBox("Loop");
     private final Component horizontalStrut = Box.createHorizontalStrut(75);
     private final Component horizontalStrut_1 = Box.createHorizontalStrut(20);
     private final Component horizontalStrut_2 = Box.createHorizontalStrut(20);
-	private static final FileFilter midiFilter = new FileNameExtensionFilter("MIDI","mid");
+    private final JButton btnTempoInc1 = new JButton("+");
+    private final JButton btnTempoInc10 = new JButton("+10");
+    private final JButton btnTempoDec1 = new JButton("-");
+    private final JButton btnTempoDec10 = new JButton("-10");
+	private final static FileFilter midiFilter = new FileNameExtensionFilter("MIDI","mid");
+	private final static Border defaultBorder = new JButton().getBorder();
+	private final static Border testBorder = new CompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.YELLOW, Color.YELLOW),new EmptyBorder(new JButton().getMargin()));
+	private final static JCheckBox chckbxLoop = new JCheckBox("Loop");
+	private NumberFormat nbrfmt = NumberFormat.getNumberInstance();
 	private ButtonListener buttonListener = new ButtonListener();
 	private static Timer timer;
+	private static Timer tempoBtnTimer;
+	private static int tempoModAmt;
 	private static int lastColumn;
 	private static File lastPlaylistFile = new File("");
-	private NumberFormat nbrfmt = NumberFormat.getNumberInstance();
 	private static JFormattedTextField txtTempo;
 	private final JToolBar toolBar = new JToolBar();
 	private final JLabel tempoLbl = new JLabel("Tempo:  ");
 	private static ManagedPlayer mplayer = new ManagedPlayer();
 	private static JButton[][] buttons = new JButton[8][16];
-	private static JButton[][] buttonsCopy = new JButton[8][16];
 	private JLabel[] labels = new JLabel[] {new JLabel("Snare"),
 											new JLabel("Closed Hi-Hat"),
 											new JLabel("Open Hi-Hat"),
@@ -123,7 +144,11 @@ public class ScoreWindow extends JDialog {
 		toolBar.add(horizontalStrut_1);
 		tempoLbl.setMaximumSize(tempoLbl.getPreferredSize());
 		toolBar.add(tempoLbl);
-		toolBar.add(txtTempo);
+		toolBar.add(btnTempoDec10);
+		toolBar.add(btnTempoDec1);
+		toolBar.add(txtTempo);		
+		toolBar.add(btnTempoInc1);		
+		toolBar.add(btnTempoInc10);
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -190,9 +215,81 @@ public class ScoreWindow extends JDialog {
 			}
 		});
 		
+		tempoBtnTimer = new Timer(100, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeTempo(tempoModAmt);
+			}
+		});
+		
+		tempoBtnTimer.setInitialDelay(500);
+		
+		btnTempoDec10.getModel().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (btnTempoDec10.getModel().isPressed() && !tempoBtnTimer.isRunning()) {
+					tempoModAmt = -10;
+					changeTempo(tempoModAmt);
+					tempoBtnTimer.start();
+				} else if (!btnTempoDec10.getModel().isPressed() && tempoBtnTimer.isRunning()) {
+					tempoBtnTimer.stop();
+					tempoModAmt = 0;
+				}
+			}
+		});
+		
+		btnTempoDec1.getModel().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (btnTempoDec1.getModel().isPressed() && !tempoBtnTimer.isRunning()) {
+					tempoModAmt = -1;
+					changeTempo(tempoModAmt);
+					tempoBtnTimer.start();
+				} else if (!btnTempoDec1.getModel().isPressed() && tempoBtnTimer.isRunning()) {
+					tempoBtnTimer.stop();
+					tempoModAmt = 0;
+				}
+			}
+		});
+		
+		btnTempoInc1.getModel().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (btnTempoInc1.getModel().isPressed() && !tempoBtnTimer.isRunning()) {
+					tempoModAmt = 1;
+					changeTempo(tempoModAmt);
+					tempoBtnTimer.start();
+				} else if (!btnTempoInc1.getModel().isPressed() && tempoBtnTimer.isRunning()) {
+					tempoBtnTimer.stop();
+					tempoModAmt = 0;
+				}
+			}
+		});
+		
+		btnTempoInc10.getModel().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (btnTempoInc10.getModel().isPressed() && !tempoBtnTimer.isRunning()) {
+					tempoModAmt = 10;
+					changeTempo(tempoModAmt);
+					tempoBtnTimer.start();
+				} else if (!btnTempoInc10.getModel().isPressed() && tempoBtnTimer.isRunning()) {
+					tempoBtnTimer.stop();
+					tempoModAmt = 0;
+				}
+			}
+		});
+		
 		timer = new Timer(10, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				timerEvent();
+			}
+		});
+		
+		getContentPane().setDropTarget(new DropTarget() {
+			@Override
+			public synchronized void drop(DropTargetDropEvent dtde) {
+				playListFileDrop(dtde);
 			}
 		});
 	}
@@ -202,7 +299,6 @@ public class ScoreWindow extends JDialog {
 			
 		mplayer = new ManagedPlayer();
 		try {
-			buttonsCopy = buttons;
 			lastColumn = 0;
 			mplayer.start(getSequence(getRhythmPattern()));
 			timer.start();
@@ -214,6 +310,14 @@ public class ScoreWindow extends JDialog {
 	private static void btnStop_Clicked() {
 		if (mplayer.isPlaying()) {
 			mplayer.finish();
+			buttons[0][lastColumn].setBorder(defaultBorder);
+			buttons[1][lastColumn].setBorder(defaultBorder);
+			buttons[2][lastColumn].setBorder(defaultBorder);
+			buttons[3][lastColumn].setBorder(defaultBorder);
+			buttons[4][lastColumn].setBorder(defaultBorder);
+			buttons[5][lastColumn].setBorder(defaultBorder);
+			buttons[6][lastColumn].setBorder(defaultBorder);
+			buttons[7][lastColumn].setBorder(defaultBorder);
 			timer.stop();
 		}
 	}
@@ -274,40 +378,45 @@ public class ScoreWindow extends JDialog {
 	}
 	
 	private static void timerEvent() {
-		
-		if (mplayer.isFinished()) {
-			timer.stop();
-			if (chckbxLoop.isSelected()) {
-				btnPlay_Clicked();
-			}
-		}
-		/*if (mplayer.isPlaying()) {
-			buttons[0][lastColumn].setBackground(buttonsCopy[0][lastColumn].getBackground());
-			buttons[1][lastColumn].setBackground(buttonsCopy[1][lastColumn].getBackground());
-			buttons[2][lastColumn].setBackground(buttonsCopy[2][lastColumn].getBackground());
-			buttons[3][lastColumn].setBackground(buttonsCopy[3][lastColumn].getBackground());
-			buttons[4][lastColumn].setBackground(buttonsCopy[4][lastColumn].getBackground());
-			buttons[5][lastColumn].setBackground(buttonsCopy[5][lastColumn].getBackground());
-			buttons[6][lastColumn].setBackground(buttonsCopy[6][lastColumn].getBackground());
-			buttons[7][lastColumn].setBackground(buttonsCopy[7][lastColumn].getBackground());
+		if (mplayer.isPlaying()) {
+			buttons[0][lastColumn].setBorder(defaultBorder);
+			buttons[1][lastColumn].setBorder(defaultBorder);
+			buttons[2][lastColumn].setBorder(defaultBorder);
+			buttons[3][lastColumn].setBorder(defaultBorder);
+			buttons[4][lastColumn].setBorder(defaultBorder);
+			buttons[5][lastColumn].setBorder(defaultBorder);
+			buttons[6][lastColumn].setBorder(defaultBorder);
+			buttons[7][lastColumn].setBorder(defaultBorder);
 			double percent = ((double)mplayer.getTickPosition())/((double)mplayer.getTickLength());
-			int col = (int)(16.0*percent);
-			buttons[0][col].setBackground(Color.RED);
-			buttons[1][col].setBackground(Color.RED);
-			buttons[2][col].setBackground(Color.RED);
-			buttons[3][col].setBackground(Color.RED);
-			buttons[4][col].setBackground(Color.RED);
-			buttons[5][col].setBackground(Color.RED);
-			buttons[6][col].setBackground(Color.RED);
-			buttons[7][col].setBackground(Color.RED);
+			int col = (int)(16.0*percent) > 15 ? 15 : (int)(16.0*percent);
+			buttons[0][col].setBorder(testBorder);
+			buttons[1][col].setBorder(testBorder);
+			buttons[2][col].setBorder(testBorder);
+			buttons[3][col].setBorder(testBorder);
+			buttons[4][col].setBorder(testBorder);
+			buttons[5][col].setBorder(testBorder);
+			buttons[6][col].setBorder(testBorder);
+			buttons[7][col].setBorder(testBorder);
 			lastColumn = col;
 		} else if (mplayer.isFinished()) {
+			buttons[0][lastColumn].setBorder(defaultBorder);
+			buttons[1][lastColumn].setBorder(defaultBorder);
+			buttons[2][lastColumn].setBorder(defaultBorder);
+			buttons[3][lastColumn].setBorder(defaultBorder);
+			buttons[4][lastColumn].setBorder(defaultBorder);
+			buttons[5][lastColumn].setBorder(defaultBorder);
+			buttons[6][lastColumn].setBorder(defaultBorder);
+			buttons[7][lastColumn].setBorder(defaultBorder);
 			timer.stop();
 			if (chckbxLoop.isSelected()) {
 				btnPlay_Clicked();
 			}
 		}
-		*/
+		
+	}
+	
+	private static void changeTempo(int amount) {
+		txtTempo.setValue(Integer.parseInt(txtTempo.getText()) + amount);
 	}
 	
 	private static Pattern getRhythmPattern() {
@@ -351,7 +460,7 @@ public class ScoreWindow extends JDialog {
 					else if (event.toString().contains("TempoEvent")) {
 						TempoEvent te = (TempoEvent) event;
 						txtTempo.setValue(te.getTempo());
-						tempoFactor = (60.0/(double)te.getTempo())*1000.0;
+						tempoFactor = (60.0/(double)te.getTempo())*500.0;
 					}
 				}
 			}
@@ -366,6 +475,33 @@ public class ScoreWindow extends JDialog {
 		staccatoParser.addParserListener(midiParserListener);
 		staccatoParser.parse(pattern);
 		return midiParserListener.getSequence();
+	}
+	
+	private static void playListFileDrop(DropTargetDropEvent dtde) {
+	    if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+	        dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+	        Transferable t = dtde.getTransferable();
+	        List fileList = null;
+	        try {
+	            fileList = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
+	            if (fileList != null && fileList.size() == 1) {
+	                for (Object value : fileList) {
+	                    if (value instanceof File) {
+	                        File file = (File) value;
+	                        if (file.getName().endsWith(".mid")) {
+	                        	loadEDI(file);
+	                        }
+	                    }
+	                }
+	            }
+	        } catch (UnsupportedFlavorException e) {
+	            e.printStackTrace();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    } else {
+	        dtde.rejectDrop();
+	    }
 	}
 	
     private static final Map<Integer, Character> rhythmBeatVal = new HashMap<Integer, Character>(){{

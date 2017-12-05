@@ -431,15 +431,15 @@ public class Rhythm implements PatternProducer
 	 * 49: Crash Cymbal
 	 */
     public static final Map<Character, String> ARDUINO_RHYTHM_KIT = new HashMap<Character, String>(){{
-        put('.', "Rq");
-        put('s', "[ACOUSTIC_SNARE]q");
-        put('d', "[CLOSED_HI_HAT]q");
-        put('o', "[OPEN_HI_HAT]q");
-        put('b', "[BASS_DRUM]q");
-        put('l', "[LO_TOM]q");
-        put('h', "[HI_TOM]q");
-        put('r', "[RIDE_CYMBAL_1]q");
-        put('c', "[CRASH_CYMBAL_1]q");
+        put('.', "Ri");
+        put('s', "[ACOUSTIC_SNARE]i");
+        put('d', "[CLOSED_HI_HAT]i");
+        put('o', "[OPEN_HI_HAT]i");
+        put('b', "[BASS_DRUM]i");
+        put('l', "[LO_TOM]i");
+        put('h', "[HI_TOM]i");
+        put('r', "[RIDE_CYMBAL_1]i");
+        put('c', "[CRASH_CYMBAL_1]i");
     }};
 }
 
